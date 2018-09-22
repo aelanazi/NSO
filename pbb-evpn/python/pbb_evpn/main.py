@@ -13,11 +13,24 @@ class ServiceCallbacks(Service):
     @Service.create
     def cb_create(self, tctx, root, service, proplist):
         self.log.info('Service create(service=', service._path, ')')
+        with ncs.maapi.single_write_trans('admin', 'system') as trans:
+            service = ncs.maagic.get_node(trans, kp)
+            customer_name = service.customer_name
+            pe_port_1 = service.link.pe_port_1
+            edge-i-sid = service.link.edge_i_sid
+            pe_device = service.link.pe_device
+
+
 
         vars = ncs.template.Variables()
-        vars.add('DUMMY', '127.0.0.1')
+        vars.add('PE-DEVICE', pe_device)
+        vars.add('PE-PORT-1', pe_port_1)
+        vars.add('EDGE-I-SID', edge-i-sid)
+        vars.add('CUSTOMER-NAME', customer_name)
+        #vars.add('DUMMY', '127.0.0.1')
+        #vars.add('DUMMY', '127.0.0.1')
         template = ncs.template.Template(service)
-        template.apply('pbb-evpn-template', vars)
+        template.apply('pbb-evpn-base', vars)
 
     # The pre_modification() and post_modification() callbacks are optional,
     # and are invoked outside FASTMAP. pre_modification() is invoked before

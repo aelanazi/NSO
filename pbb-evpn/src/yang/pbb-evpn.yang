@@ -30,21 +30,15 @@ module pbb-evpn {
  augment /ncs:services {
    list pbb-evpn {
      description "This is an RFS skeleton service";
-     key name;
-     unique edge-i-sid;
+     key vpn-id;
+     unique vpn-id;
 
-    leaf name {
+    leaf vpn-id {
       tailf:info "Service Instance Name";
       mandatory true;
-      type string;
+      type uint32;
       }
     
-    leaf edge-i-sid {
-      tailf:info "Unique i-sid which is used as service id";
-      type uint32;
-      description "PBB EDGE I-SID";
-      }
-
     uses ncs:service-data;
     ncs:servicepoint pbb-evpn-servicepoint;
 
@@ -71,6 +65,12 @@ module pbb-evpn {
         mandatory true;
         type string;
       }
+
+      leaf edge-i-sid {
+        tailf:info "Unique i-sid which is used as service id";
+        type uint32;
+        description "PBB EDGE I-SID";
+        }
 
       leaf pe-device {
         tailf:info "Edge-PE where service will be configured";

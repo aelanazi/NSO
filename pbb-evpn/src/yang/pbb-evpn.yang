@@ -34,7 +34,7 @@ module pbb-evpn {
      unique vpn-id;
 
     leaf vpn-id {
-      tailf:info "Service Instance Name";
+      tailf:info "VPN Service Instance id";
       mandatory true;
       type uint32;
       }

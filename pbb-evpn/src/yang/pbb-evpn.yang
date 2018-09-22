@@ -12,38 +12,123 @@ module pbb-evpn {
   import tailf-ncs {
     prefix ncs;
   }
+  //import tailf-ned-cisco-ios-xr { prefix cisco-ios-xr; }
 
   description
-    "Bla bla...";
+    "PBB-EVPN RFS Service";
 
-  revision 2016-01-01 {
+  revision 2018-09-22 {
     description
       "Initial revision.";
   }
 
-  list pbb-evpn {
-    description "This is an RFS skeleton service";
+ augment /ncs:services {
+   list pbb-evpn {
+     description "This is an RFS skeleton service";
+     key name;
+     unique edge-i-sid;
 
-    key name;
     leaf name {
-      tailf:info "Unique service id";
-      tailf:cli-allow-range;
+      tailf:info "Service Instance Name";
+      mandatory true;
       type string;
-    }
+      }
+    
+    leaf edge-i-sid {
+      tailf:info "Unique i-sid which is used as service id";
+      type uint16;
+      description "PBB EDGE I-SID";
+      }
 
     uses ncs:service-data;
     ncs:servicepoint pbb-evpn-servicepoint;
 
-    // may replace this with other ways of refering to the devices.
-    leaf-list device {
-      type leafref {
-        path "/ncs:devices/ncs:device/ncs:name";
-      }
+    leaf evi {
+      type uint16 {
+        range "1..65535";
+        }
+        description "evi";
+        }
+    
+    leaf customer-name {
+      tailf:info "Customer Name";
+      mandatory true;
+      type string;
     }
 
-    // replace with your own stuff here
-    leaf dummy {
-      type inet:ipv4-address;
-    }
+    list link {
+      tailf:info "PE-CE Attachment Point";
+      key link-id;
+      min-elements 1;
+
+      leaf link-id {
+        tailf:info "Link ID";
+        mandatory true;
+        type string;
+      }
+
+      leaf pe-device {
+        tailf:info "Edge-PE where service will be configured";
+        type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+        }
+      }
+
+	    leaf svlan-id {       
+        tailf:info "Service VLAN ID(S-Tag)";      
+        mandatory true;
+        type uint16 {
+        range "1..4094" {
+        error-message "Service VLAN ID is out of range";
+          }
+        }
+      }
+
+        leaf pe-port-1 {
+          tailf:info "Customer Facing Interface";
+          type string;
+          mandatory true;
+          must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device
+                    = current()/../pe-device][pe-port-1=current()]) = 0" {
+          error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+
+        /*leaf port-2 {
+          tailf:info "Customer Facing Interface";
+          type string;
+          must "count(../../../CEN-PE[customer-name != current()/../../customer-name]/link[device
+                    = current()/../device][port-2=current()]) = 0" {
+            error-message "Interface is already used for another link.";
+            }
+          }*/
+
+        container Bundle-Ether {
+          when "../interface-type = 'Bundle-Ether'";
+
+          leaf pe-port-2 {
+            tailf:info "Customer Facing Interface";
+            type string;
+            mandatory true;
+            must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device
+                    = current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+        }
+
+        leaf interface-type {
+          type enumeration {
+            enum GigabitEthernet;
+            enum TenGigabitEthernet; 
+            enum Bundle-Ether;
+          }
+          default GigabitEthernet;
+        }
+      }
+      
+
+
   }
+ }
 }

@@ -1,0 +1,183 @@
+module l2vpn {
+  namespace "http://com/example/l2vpn";
+  prefix l2vpn;
+
+  import ietf-inet-types { prefix inet; }
+  import tailf-ncs { prefix ncs; }
+  import tailf-common { prefix tailf; }
+  import tailf-ned-cisco-ios { prefix ios; }
+  import tailf-ned-cisco-ios-xr { prefix cisco-ios-xr; }
+  import junos { prefix junos; }
+
+  container id-database {
+    leaf start {
+      type uint32;
+      default 100;
+    }
+
+    leaf stop {
+      must "current() > ../start";
+      type uint32;
+      default 200;
+    }
+
+    leaf-list used-ids {
+      type uint32;
+      config false;
+        tailf:cdb-oper {
+            tailf:persistent true;
+      }
+    }
+  }
+
+  augment /ncs:services {
+    list l2vpn {
+      key name;
+      unique pw-id;
+
+      uses ncs:service-data;
+      ncs:servicepoint l2vpn-servicepoint;
+
+      leaf name {
+        tailf:info "Service Instance Name";
+        mandatory true;
+        type string;
+      }
+
+      leaf pw-id {
+        tailf:info "Unique Pseudowire ID";
+        mandatory true;
+        type uint32 {
+          range "1..4294967295";
+        }
+        
+        /* Uncomment for second part of the lab (PW ID allocation with custom subscriber) 
+        
+      config false;
+      tailf:cdb-oper {
+        tailf:persistent true;
+      }*/
+      
+      }
+
+      leaf customer {
+        tailf:info "Customer Name";
+        mandatory true;
+        type string;
+      }
+
+      list link {
+        tailf:info "Attachment Circuits";
+        min-elements 2;
+        max-elements 2;
+        key device;
+
+        leaf device {
+          tailf:info "PE Router";
+          mandatory true;
+          type leafref {
+            path "/ncs:devices/ncs:device/ncs:name";
+          }
+        }
+
+        container ios {
+          when "deref(../device)/../ncs:module[1]/ncs:name='tailf-ned-cisco-ios'" {
+            tailf:dependency "../device";
+          }
+          tailf:cli-drop-node-name;
+
+          leaf intf-number {
+            tailf:info "GigabitEthernet Interface ID";
+            mandatory true;
+            type leafref {
+              path "deref(../../device)/../ncs:config/ios:interface/ios:GigabitEthernet/ios:name";
+            }
+          }
+
+
+	       leaf svlan-id {       
+          tailf:info "Service VLAN ID(S-Tag)";      
+          mandatory true;
+          type uint16 {
+          range "1..4094" {
+          error-message "Service VLAN ID is out of range";
+            }
+           }
+         }
+
+         leaf loopback-interface {
+            tailf:info "Loopback Interface ID";
+            type string;
+            default "0";
+          }
+        }
+
+        container iosxr {
+          when "deref(../device)/../ncs:module[3]/ncs:name='tailf-ned-cisco-ios-xr'" {
+            tailf:dependency "../device";
+          }
+          tailf:cli-drop-node-name;
+
+          leaf intf-number {
+            tailf:info "GigabitEthernet Interface ID";
+            mandatory true;
+            type leafref {
+              path "deref(../../device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+          }
+
+ 	       leaf svlan-id {       
+           tailf:info "Service VLAN ID(S-Tag)";      
+           mandatory true;
+           type uint16 {
+           range "1..4094" {
+           error-message "Service VLAN ID is out of range";
+             }
+            }
+           }
+
+          leaf loopback-interface {
+            tailf:info "Loopback Interface ID";
+            type string;
+            default "0";
+          }
+        }
+
+        container junos {
+          when "deref(../device)/../ncs:module[1]/ncs:name='junos'" {
+            tailf:dependency "../device";
+          }
+          tailf:cli-drop-node-name;
+
+          leaf intf-number {
+            tailf:info "GigabitEthernet Interface ID";
+            mandatory true;
+            type leafref {
+              path "deref(../../device)/../ncs:config/junos:configuration/junos:interfaces/junos:interface/junos:name";
+            }
+          }
+
+
+	      leaf svlan-id {
+          tailf:info "Service VLAN ID(S-Tag)";
+          mandatory true;
+          type uint16 {
+          range "1..4094" {
+          error-message "Service VLAN ID is out of range";
+            }
+           }
+         }
+
+          leaf loopback-interface {
+            tailf:info "Loopback Interface ID";
+            type string;
+            default "0";
+          }
+        }  
+ 
+     }
+
+    }
+  }
+}
+

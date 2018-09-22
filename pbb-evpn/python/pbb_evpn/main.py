@@ -13,22 +13,25 @@ class ServiceCallbacks(Service):
     @Service.create
     def cb_create(self, tctx, root, service, proplist):
         self.log.info('Service create(service=', service._path, ')')
-        with ncs.maapi.single_write_trans('admin', 'system') as trans:
-            service = ncs.maagic.get_node(trans, kp)
-            customer_name = service.customer_name
-            pe_port_1 = service.link.pe_port_1
-            edge-i-sid = service.link.edge_i_sid
-            pe_device = service.link.pe_device
+
+        customer_name = service.customer_name
+        evi = service.evi
+        for link in service.link:
+            pe_port_1 = link.pe_port_1
+            edge_i_sid = link.edge_i_sid
+            pe_device = link.pe_device
+            svlan_id = link.svlan_id
+            
 
 
 
         vars = ncs.template.Variables()
         vars.add('PE-DEVICE', pe_device)
         vars.add('PE-PORT-1', pe_port_1)
-        vars.add('EDGE-I-SID', edge-i-sid)
+        vars.add('EDGE-I-SID', edge_i_sid)
         vars.add('CUSTOMER-NAME', customer_name)
-        #vars.add('DUMMY', '127.0.0.1')
-        #vars.add('DUMMY', '127.0.0.1')
+        vars.add('SVLAN-ID', svlan_id)
+        vars.add('EVI', evi)
         template = ncs.template.Template(service)
         template.apply('pbb-evpn-base', vars)
 

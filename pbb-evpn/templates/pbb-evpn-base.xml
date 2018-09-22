@@ -105,15 +105,15 @@
                    </interface>
                    <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <evi>
-                       <id>{/evi}</id>
+                       <id>{$EVI}</id>
                        <bgp>
-                         <rd>65004:{/vpn-id}</rd>
+                         <rd>65004:RT</rd>
                          <route-target>
                            <import>
-                             <name>65004:{/vpn-id}</name>
+                             <name>65004:RT</name>
                            </import>
                            <export>
-                             <name>65004:{/vpn-id}</name>
+                             <name>65004:RT</name>
                            </export>
                          </route-target>
                        </bgp>
@@ -128,7 +128,7 @@
                            <pbb>
                              <core>
                                <evpn>
-                                 <evi>{/evi}</evi>
+                                 <evi>{$EVI}</evi>
                                </evpn>
                              </core>
                            </pbb>
@@ -144,12 +144,12 @@
                              </limit>
                            </mac>
                            <interface>
-                             <name>{/link/interface-type}{/link/port-1}.{/link/svlan-id}</name>
+                             <name>{/link/interface-type}{$PE-PORT-1}.{$SVLAN-ID}</name>
                            </interface>
                            <pbb>
                              <edge>
                                <i-sid>{$EDGE-I-SID}</i-sid>
-                               <core-bridge>PBB_EVPN_CORE-{/evi}</core-bridge>
+                               <core-bridge>PBB_EVPN_CORE-{$EVI}</core-bridge>
                              </edge>
                            </pbb>
                          </bridge-domain>

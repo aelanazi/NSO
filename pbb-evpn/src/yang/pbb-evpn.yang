@@ -12,7 +12,8 @@ module pbb-evpn {
   import tailf-ncs {
     prefix ncs;
   }
-  //import tailf-ned-cisco-ios-xr { prefix cisco-ios-xr; }
+  
+  import tailf-ned-cisco-ios-xr { prefix cisco-ios-xr; }
 
   description
     "PBB-EVPN RFS Service";
@@ -89,35 +90,28 @@ module pbb-evpn {
         }
       }
 
-        leaf pe-port-1 {
+
+      leaf pe-port-1 {
           tailf:info "Customer Facing Interface";
-          type string;
-          mandatory true;
-          must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device
-                    = current()/../pe-device][pe-port-1=current()]) = 0" {
-          error-message "Interface is already used by another service, please make sure to pick free port.";
-            }
+          type leafref {
+            path "deref(../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
           }
-
-        /*leaf port-2 {
-          tailf:info "Customer Facing Interface";
-          type string;
-          must "count(../../../CEN-PE[customer-name != current()/../../customer-name]/link[device
-                    = current()/../device][port-2=current()]) = 0" {
-            error-message "Interface is already used for another link.";
-            }
-          }*/
-
-        container Bundle-Ether {
-          when "../interface-type = 'Bundle-Ether'";
-
-          leaf pe-port-2 {
-            tailf:info "Customer Facing Interface";
-            type string;
-            mandatory true;
-            must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device
+          mandatory true;
+          //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+        }
+          
+          container Bundle-Ether {
+            when "../interface-type = 'Bundle-Ether'";
+            
+            leaf pe-port-2 {
+              tailf:info "Customer Facing Interface";
+              type string;
+              mandatory true;
+              must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device
                     = current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-            error-message "Interface is already used by another service, please make sure to pick free port.";
+              error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
         }

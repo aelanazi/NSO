@@ -8,10 +8,15 @@ SRC = $(wildcard yang/*.yang)
 DIRS = ../load-dir java/src/$(JDIR)/$(NS)
 FXS = $(SRC:yang/%.yang=../load-dir/%.fxs)
 
+#YANGPATH ?= --yangpath yang
+#YANGPATH += --yangpath ../../cisco-ios/src/ncsc-out/modules/yang
+#YANGPATH += --yangpath ../../cisco-iosxr/src/ncsc-out/modules/yang
+#YANGPATH += --yangpath ../../juniper-junos/src/ncsc-out/modules/yang
+
 ## Uncomment and patch the line below if you have a dependency to a NED
 ## or to other YANG files
-# YANGPATH += ../../<ned-name>/src/ncsc-out/modules/yang \
-# 	../../<pkt-name>/src/yang
+YANGPATH += ../../cisco-iosxr/src/ncsc-out/modules/yang #\
+# 	../../cisco-iosxr/src/yang
 
 NCSCPATH   = $(YANGPATH:%=--yangpath %)
 YANGERPATH = $(YANGPATH:%=--path %)

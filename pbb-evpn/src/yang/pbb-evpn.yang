@@ -160,7 +160,7 @@ module pbb-evpn {
 
     grouping route-target-grouping {
 
-    list "export" {
+    list "rt-export" {
       tailf:info "Export Target-VPN community";
       tailf:cli-suppress-mode;
       tailf:cli-delete-when-empty;
@@ -172,7 +172,7 @@ module pbb-evpn {
       }
     }
 
-    list "import" {
+    list "rt-import" {
       tailf:info "Import Target-VPN community";
       tailf:cli-suppress-mode;
       tailf:cli-delete-when-empty;

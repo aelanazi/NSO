@@ -31,7 +31,7 @@
                        <TenGigE>
                          <id>{$PE-PORT-1}.{$SVLAN-ID}</id>
                          <mode>l2transport</mode>
-                         <description>[UNI-N] [$CEDD Name/CEMUDD Name] [{/customer-name}] [Kundennummer(Service-ID)]</description>
+                         <description>[UNI-N] [$CEDD Name/CEMUDD Name] [{$CUSTOMER-NAME}] [Kundennummer(Service-ID)]</description>
                          <encapsulation>
                            <dot1q>
                              <vlan-id>{$SVLAN-ID}</vlan-id>
@@ -83,7 +83,7 @@
                        <GigabitEthernet>
                          <id>{$PE-PORT-1}.{$SVLAN-ID}</id>
                          <mode>l2transport</mode>
-                         <description>[UNI-N] [$CEDD Name] [{/customer}] [$Kundennummer($Service-ID)]</description>
+                         <description>[UNI-N] [$CEDD Name] [{$CUSTOMER-NAME}] [$Kundennummer($Service-ID)]</description>
                          <encapsulation>
                            <dot1q>
                              <vlan-id>{$SVLAN-ID}</vlan-id>
@@ -105,15 +105,15 @@
                    </interface>
                    <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <evi>
-                       <id>{$EVI}</id>
+                       <id>49100</id>
                        <bgp>
-                         <rd>65004:RT</rd>
+                         <rd>65004:149172</rd>
                          <route-target>
                            <import>
-                             <name>65004:RT</name>
+                             <name>{$RT_EXPORT}</name>
                            </import>
                            <export>
-                             <name>65004:RT</name>
+                             <name>{$RT_EXPORT}</name>
                            </export>
                          </route-target>
                        </bgp>
@@ -124,7 +124,7 @@
                        <group>
                          <group-name>PBB_EVPN_CORE</group-name>
                          <bridge-domain>
-                           <bridge-domain-name>PBB_EVPN_CORE-100</bridge-domain-name>
+                           <bridge-domain-name>PBB_EVPN_CORE-{$EVI}</bridge-domain-name>
                            <pbb>
                              <core>
                                <evpn>
@@ -137,7 +137,7 @@
                        <group>
                          <group-name>PBB_EVPN_EDGE</group-name>
                          <bridge-domain>
-                           <bridge-domain-name>PBB_EVPN_EDGE-200</bridge-domain-name>
+                           <bridge-domain-name>PBB_EVPN_EDGE-{$EVI}</bridge-domain-name>
                            <mac>
                              <limit>
                                <maximum>4095</maximum>

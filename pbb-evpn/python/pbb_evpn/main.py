@@ -13,27 +13,43 @@ class ServiceCallbacks(Service):
     @Service.create
     def cb_create(self, tctx, root, service, proplist):
         self.log.info('Service create(service=', service._path, ')')
-
+        
         customer_name = service.customer_name
         evi = service.evi
+
+        links_data = []
         for link in service.link:
-            pe_port_1 = link.pe_port_1
-            edge_i_sid = link.edge_i_sid
-            pe_device = link.pe_device
-            svlan_id = link.svlan_id
-            
+            link_data = {'pe_device': link.pe_device}
+            link_data['pe_port_1'] = link.pe_port_1
+            link_data['edge_i_sid'] = link.edge_i_sid
+            link_data ['svlan_id'] = link.svlan_id
+            links_data.append(link_data)
+            for RT_IMPORT in link.route_target.rt_export:
+                link_data['route_target_export'] = RT_IMPORT.asn_ip
+                links_data.append(link_data)
+                for RT_EXPORT in link.route_target.rt_import:
+                    link_data['route_target_import'] = RT_EXPORT.asn_ip
+                    links_data.append(link_data)
+
+            self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
+
+        for index, link in enumerate(links_data):
+            self.log.info('Configuring device {}'.format(link['pe_device']))
+            vars = ncs.template.Variables()
+            vars.add('CUSTOMER-NAME', customer_name)
+            vars.add('EVI', evi)
+            vars.add('PE-DEVICE', link['pe_device'])
+            vars.add('PE-PORT-1', link['pe_port_1'])
+            vars.add('EDGE-I-SID', link['edge_i_sid'])
+            vars.add('SVLAN-ID', link['svlan_id'])
+            vars.add('RT_EXPORT', link['route_target_export'])
+            vars.add('RT_IMPORT', link['route_target_import'])
+            template = ncs.template.Template(service)
+            template.apply('pbb-evpn-base', vars)
 
 
 
-        vars = ncs.template.Variables()
-        vars.add('PE-DEVICE', pe_device)
-        vars.add('PE-PORT-1', pe_port_1)
-        vars.add('EDGE-I-SID', edge_i_sid)
-        vars.add('CUSTOMER-NAME', customer_name)
-        vars.add('SVLAN-ID', svlan_id)
-        vars.add('EVI', evi)
-        template = ncs.template.Template(service)
-        template.apply('pbb-evpn-base', vars)
+
 
     # The pre_modification() and post_modification() callbacks are optional,
     # and are invoked outside FASTMAP. pre_modification() is invoked before

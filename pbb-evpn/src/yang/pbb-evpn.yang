@@ -3,9 +3,10 @@ module pbb-evpn {
   namespace "http://example.com/pbb-evpn";
   prefix pbb-evpn;
 
-  import ietf-inet-types {
-    prefix inet;
-  }
+  //import ietf-inet-types {
+  //  prefix inet;
+  //}
+  
   import tailf-common {
     prefix tailf;
   }
@@ -17,22 +18,24 @@ module pbb-evpn {
 
   description
     "PBB-EVPN RFS Service";
+ 
+  revision 2018-09-23 {
+    description
+      "working vision.";
+  }
 
   revision 2018-09-22 {
     description
       "Initial revision.";
   }
-  revision 2018-09-23 {
-    description
-      "working vision.";
-  }
+
 
 
  augment /ncs:services {
    list pbb-evpn {
      description "This is an RFS skeleton service";
      key vpn-id;
-     unique vpn-id;
+     //unique vpn-id;
 
     leaf vpn-id {
       tailf:info "VPN Service Instance id";
@@ -45,9 +48,9 @@ module pbb-evpn {
 
     leaf evi {
       type uint16 {
-        range "1..65535";
+        range "49000..49999";
         }
-        description "evi";
+        description "EVPN Instance ID, Country DE allowed range 49,000 – 49,999, For IA Connected=49102, Static:49103";
         }
     
     leaf customer-name {
@@ -68,9 +71,12 @@ module pbb-evpn {
       }
 
       leaf edge-i-sid {
-        tailf:info "Unique i-sid which is used as service id";
-        type uint32;
-        description "PBB EDGE I-SID";
+        tailf:info "Instance Service ID";
+        description "Instance Service ID, Country DE 4900000 to 4999999";
+        type uint32 {
+        range "49000..49999"{
+            }
+          }
         }
 
       leaf pe-device {
@@ -103,17 +109,39 @@ module pbb-evpn {
         }
           
           container Bundle-Ether {
-            when "../interface-type = 'Bundle-Ether'";
-            
-            leaf pe-port-2 {
-              tailf:info "Customer Facing Interface";
-              type string;
-              mandatory true;
-              must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device
-                    = current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-              error-message "Interface is already used by another service, please make sure to pick free port.";
-            }
+            when "../nni-redundancy = 'Protected'";
+              
+              leaf pe-port-2 {
+                tailf:info "Customer Facing Interface";
+                type string;
+                mandatory true;
+                must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
+                  }
+              }
           }
+
+
+          container Dual-PE {
+            when "../nni-redundancy = 'Dual-PE'";
+            
+
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0-9a-fA-F]+\.[0-9a-fA-F]+\.[0-9a-fA-F]+';
+                }
+              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
+              }
+          }
+
+        leaf nni-redundancy {
+          type enumeration {
+            enum None;
+            enum Protected; 
+            enum Dual-PE;
+          }
+          default None;
         }
 
         leaf interface-type {
@@ -124,7 +152,52 @@ module pbb-evpn {
           }
           default GigabitEthernet;
         }
+        
+        container route-target {
+          tailf:info "Specify Target VPN Extended Communities";
+          uses route-target-grouping;
+          }
+
+    grouping route-target-grouping {
+
+    list "export" {
+      tailf:info "Export Target-VPN community";
+      tailf:cli-suppress-mode;
+      tailf:cli-delete-when-empty;
+      key asn-ip;
+      leaf asn-ip {
+        type asn-ip-type {
+          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+        }
       }
+    }
+
+    list "import" {
+      tailf:info "Import Target-VPN community";
+      tailf:cli-suppress-mode;
+      tailf:cli-delete-when-empty;
+      key asn-ip;
+      leaf asn-ip {
+        type asn-ip-type {
+          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+        }
+      }
+    }
+  }
+
+ // ASN IP type
+  typedef asn-ip-type {
+    type string {
+      tailf:info "ASN:nn or IP-address:nn";
+      pattern '(([0-9]+)|((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])'
+        +'\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))):[0-9]+';
+    }
+  }
+
+
+
+
+  }
       
 
 

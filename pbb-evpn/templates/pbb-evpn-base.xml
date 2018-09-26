@@ -110,9 +110,9 @@
                          <rd>65004:149172</rd>
                          <route-target>
                            <import>
-                             <name>{$RT_EXPORT}</name>
+                             <name foreach="{/link/route-target/rt-import}">{$RT_IMPORT}</name>
                            </import>
-                           <export>
+                           <export tags="merge" foreach="{/link/route-target/rt-export}">
                              <name>{$RT_EXPORT}</name>
                            </export>
                          </route-target>

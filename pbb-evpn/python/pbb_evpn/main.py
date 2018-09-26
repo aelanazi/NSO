@@ -18,21 +18,29 @@ class ServiceCallbacks(Service):
         evi = service.evi
 
         links_data = []
+        rt_import_list = []
+        rt_export_list = []
+
         for link in service.link:
             link_data = {'pe_device': link.pe_device}
             link_data['pe_port_1'] = link.pe_port_1
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
-            links_data.append(link_data)
-            for RT_IMPORT in link.route_target.rt_export:
-                link_data['route_target_export'] = RT_IMPORT.asn_ip
-                links_data.append(link_data)
-                for RT_EXPORT in link.route_target.rt_import:
-                    link_data['route_target_import'] = RT_EXPORT.asn_ip
-                    links_data.append(link_data)
-
-            self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
-
+        for RT_IMPORT in link.route_target.rt_import:
+            self.log.info("Full list of dict: ", RT_IMPORT.asn_ip)
+            if RT_IMPORT.asn_ip not in rt_import_list:
+                rt_import_list1 = {'route_target_import': RT_IMPORT.asn_ip}
+                rt_import_list.append(rt_import_list1)
+        for RT_EXPORT in link.route_target.rt_export:
+            self.log.info("Full list of dict: ", RT_EXPORT.asn_ip)
+            if RT_EXPORT.asn_ip not in rt_export_list:
+                rt_export_list1 = {'route_target_export': RT_EXPORT.asn_ip}
+                rt_export_list.append(rt_export_list1)
+        links_data.append(link_data)
+        
+        self.log.info("Full list of dict: ", links_data)
+        self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
+        
         for index, link in enumerate(links_data):
             self.log.info('Configuring device {}'.format(link['pe_device']))
             vars = ncs.template.Variables()
@@ -42,11 +50,12 @@ class ServiceCallbacks(Service):
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
-            vars.add('RT_EXPORT', link['route_target_export'])
-            vars.add('RT_IMPORT', link['route_target_import'])
+        for index, link1 in enumerate(rt_import_list):
+            vars.add('RT_IMPORT', link1['route_target_import'])
+        for index, link2 in enumerate(rt_export_list):
+            vars.add('RT_EXPORT', link2['route_target_export'])
             template = ncs.template.Template(service)
             template.apply('pbb-evpn-base', vars)
-
 
 
 

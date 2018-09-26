@@ -109,8 +109,8 @@
                        <bgp>
                          <rd>65004:149172</rd>
                          <route-target>
-                           <import>
-                             <name foreach="{/link/route-target/rt-import}">{$RT_IMPORT}</name>
+                           <import foreach="{/link/route-target/rt-import}">
+                             <name>{$RT_IMPORT}</name>
                            </import>
                            <export tags="merge" foreach="{/link/route-target/rt-export}">
                              <name>{$RT_EXPORT}</name>

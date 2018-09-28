@@ -18,7 +18,12 @@ module pbb-evpn {
 
   description
     "PBB-EVPN RFS Service";
- 
+
+  revision 2018-09-28 {
+    description
+      "added services logic and corrected interface selection";
+  }
+
   revision 2018-09-23 {
     description
       "working vision.";
@@ -46,6 +51,16 @@ module pbb-evpn {
     uses ncs:service-data;
     ncs:servicepoint pbb-evpn-servicepoint;
 
+    leaf service-type {
+      description "instance type Point-to-Point, multipoint-to-multipoint, Rooted-multipoint" ;
+      mandatory true;
+      type enumeration {
+        enum E-Line;
+        enum E-Lan;
+        enum E-Tree;
+      }
+    }
+
     leaf evi {
       type uint16 {
         range "49000..49999";
@@ -59,10 +74,14 @@ module pbb-evpn {
       type string;
     }
 
+
+    container eline {
+      when "(../service-type = 'E-Line')";
+
     list link {
       tailf:info "PE-CE Attachment Point";
       key link-id;
-      min-elements 1;
+      max-elements 2;
 
       leaf link-id {
         tailf:info "Link ID";
@@ -96,18 +115,39 @@ module pbb-evpn {
         }
       }
 
-
-      leaf pe-port-1 {
-          tailf:info "Customer Facing Interface";
-          type leafref {
-            path "deref(../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+        leaf interface-type {
+          type enumeration {
+            enum GigabitEthernet;
+            enum TenGigabitEthernet;
+            }
+          default GigabitEthernet;
           }
-          mandatory true;
-          //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+        
+        container pe-port {
+          leaf pe-gig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'GigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
-        }
-          
+            }
+          leaf pe-tengig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'TenGigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+            }
+          }
+
           container Bundle-Ether {
             when "../nni-redundancy = 'Protected'";
               
@@ -122,7 +162,6 @@ module pbb-evpn {
                 
               }
           }
-
 
           container Dual-PE {
             when "../nni-redundancy = 'Dual-PE'";
@@ -146,6 +185,53 @@ module pbb-evpn {
           default None;
         }
 
+        container route-target {
+          tailf:info "Specify Target VPN Extended Communities";
+          uses route-target-grouping;
+          }
+        }
+      }
+  
+ container elan {
+      when "(../service-type = 'E-Lan')";
+
+    list link {
+      tailf:info "PE-CE Attachment Point";
+      key link-id;
+      min-elements 2;
+
+      leaf link-id {
+        tailf:info "Link ID";
+        mandatory true;
+        type string;
+      }
+
+      leaf edge-i-sid {
+        tailf:info "Instance Service ID";
+        description "Instance Service ID, Country DE 4900000 to 4999999";
+        type uint32 {
+        range "4900000..4999999"{
+            }
+          }
+        }
+
+      leaf pe-device {
+        tailf:info "Edge-PE where service will be configured";
+        type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+        }
+      }
+
+	    leaf svlan-id {       
+        tailf:info "Service VLAN ID(S-Tag)";      
+        mandatory true;
+        type uint16 {
+        range "1..4094" {
+        error-message "Service VLAN ID is out of range";
+          }
+        }
+      }
+
         leaf interface-type {
           type enumeration {
             enum GigabitEthernet;
@@ -154,12 +240,206 @@ module pbb-evpn {
           default GigabitEthernet;
           }
         
+
+        container pe-port {
+          leaf pe-gig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'GigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+            }
+          leaf pe-tengig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'TenGigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+            }
+          }
+          
+          container Bundle-Ether {
+            when "../nni-redundancy = 'Protected'";
+              
+              leaf pe-port-2 {
+                tailf:info "Customer Facing Interface";
+                type leafref {
+                  path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+                  }
+                mandatory true;
+                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+                //error-message "Interface is already used by another service, please make sure to pick free port.";
+                
+              }
+          }
+
+          container Dual-PE {
+            when "../nni-redundancy = 'Dual-PE'";
+            
+
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
+                }
+              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
+              }
+          }
+
+        leaf nni-redundancy {
+          type enumeration {
+            enum None;
+            enum Protected; 
+            enum Dual-PE;
+          }
+          default None;
+        }
+
         container route-target {
           tailf:info "Specify Target VPN Extended Communities";
           uses route-target-grouping;
           }
+        }
+      }
 
-    grouping route-target-grouping {
+container etree {
+      when "(../service-type = 'E-Tree')";
+
+    list link {
+      tailf:info "PE-CE Attachment Point";
+      key link-id;
+      min-elements 2;
+
+      leaf link-id {
+        tailf:info "Link ID";
+        mandatory true;
+        type string;
+      }
+
+      leaf edge-i-sid {
+        tailf:info "Instance Service ID";
+        description "Instance Service ID, Country DE 4900000 to 4999999";
+        type uint32 {
+        range "4900000..4999999"{
+            }
+          }
+        }
+
+        leaf ce-type {
+          tailf:info "define CE type root or leaf eq hub or spoke";
+          type enumeration {
+            enum hub;
+            enum spoke; 
+        }
+        }
+
+      leaf pe-device {
+        tailf:info "Edge-PE where service will be configured";
+        type leafref {
+        path "/ncs:devices/ncs:device/ncs:name";
+        }
+      }
+
+	    leaf svlan-id {       
+        tailf:info "Service VLAN ID(S-Tag)";      
+        mandatory true;
+        type uint16 {
+        range "1..4094" {
+        error-message "Service VLAN ID is out of range";
+          }
+        }
+      }
+
+        leaf interface-type {
+          type enumeration {
+            enum GigabitEthernet;
+            enum TenGigabitEthernet;
+            }
+          default GigabitEthernet;
+          }
+        
+
+        container pe-port {
+          leaf pe-gig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'GigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+            }
+          leaf pe-tengig-port {
+            tailf:info "Customer Facing Interface";
+            when "(../../interface-type = 'TenGigabitEthernet')";
+            type leafref {
+              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+            //error-message "Interface is already used by another service, please make sure to pick free port.";
+            //}
+            }
+          }
+      
+          
+          container Bundle-Ether {
+            when "../nni-redundancy = 'Protected'";
+              
+              leaf pe-port-2 {
+                tailf:info "Customer Facing Interface";
+                type leafref {
+                  path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+                  }
+                mandatory true;
+                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+                //error-message "Interface is already used by another service, please make sure to pick free port.";
+                
+              }
+          }
+
+          container Dual-PE {
+            when "../nni-redundancy = 'Dual-PE'";
+            
+
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
+                }
+              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
+              }
+          }
+
+        leaf nni-redundancy {
+          type enumeration {
+            enum None;
+            enum Protected; 
+            enum Dual-PE;
+          }
+          default None;
+        }
+
+        container route-target {
+          tailf:info "Specify Target VPN Extended Communities";
+          uses route-target-grouping;
+          }
+        }
+      }
+  
+
+
+  grouping route-target-grouping {
 
     list "rt-export" {
       tailf:info "Export Target-VPN community";
@@ -192,14 +472,8 @@ module pbb-evpn {
       tailf:info "ASN:nn or IP-address:nn";
       pattern '(([0-9]+)|((([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])'
         +'\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]))):[0-9]+';
+      }
     }
-  }
-
-
-
-
-  }
-      
 
 
   }

@@ -3,122 +3,6 @@
   <device>
       <name>{$PE-DEVICE}</name>
                  <config>
-                    <interface xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="merge" when="{/link/interface-type='TenGigabitEthernet'}">
-                     <TenGigE>
-                       <id>{$PE-PORT-1}</id>
-                       <description>[UNI-N] [$Leitungs-ID] [$CEDD Name/CEMUDD Name]</description>
-                       <load-interval>30</load-interval>
-                       <mtu>9022</mtu>
-                     </TenGigE>
-                     <TenGigE-subinterface>
-                       <TenGigE>
-                         <id>{$PE-PORT-1}.199</id>
-                         <description>[UNI-N] [$CEDD Name] [Management]</description>
-                         <encapsulation>
-                           <dot1q>
-                             <vlan-id>199</vlan-id>
-                           </dot1q>
-                         </encapsulation>
-                         <rewrite>
-                           <ingress>
-                             <tag>
-                               <pop>1</pop>
-                               <mode>symmetric</mode>
-                             </tag>
-                           </ingress>
-                         </rewrite>
-                       </TenGigE>
-                       <TenGigE>
-                         <id>{$PE-PORT-1}.{$SVLAN-ID}</id>
-                         <mode>l2transport</mode>
-                         <description>[UNI-N] [$CEDD Name/CEMUDD Name] [{$CUSTOMER-NAME}] [Kundennummer(Service-ID)]</description>
-                         <encapsulation>
-                           <dot1q>
-                             <vlan-id>{$SVLAN-ID}</vlan-id>
-                           </dot1q>
-                         </encapsulation>
-                         <rewrite>
-                           <ingress>
-                             <tag>
-                               <pop>1</pop>
-                               <mode>symmetric</mode>
-                             </tag>
-                           </ingress>
-                         </rewrite>
-                         <l2protocol>
-                           <cpsv>tunnel</cpsv>
-                         </l2protocol>
-                       </TenGigE>
-                     </TenGigE-subinterface>
-                    </interface>
-                    <interface xmlns="http://tail-f.com/ned/cisco-ios-xr" tags="merge" when="{/link/interface-type='GigabitEthernet'}">
-                     <GigabitEthernet>
-                       <id>{$PE-PORT-1}</id>
-                       <description>[UNI-N] [$CEDD Name] [Management]</description>
-                       <mtu>9022</mtu>
-                       <negotiation>
-                         <auto/>
-                       </negotiation>
-                       <load-interval>30</load-interval>
-                     </GigabitEthernet>
-                     <GigabitEthernet-subinterface>
-                       <GigabitEthernet>
-                         <id>{$PE-PORT-1}.199</id>
-                         <mode>l2transport</mode>
-                         <description>[UNI-N] [$CEDD Name] [Management]</description>
-                         <encapsulation>
-                           <dot1q>
-                             <vlan-id>199</vlan-id>
-                           </dot1q>
-                         </encapsulation>
-                         <rewrite>
-                           <ingress>
-                             <tag>
-                               <pop>1</pop>
-                               <mode>symmetric</mode>
-                             </tag>
-                           </ingress>
-                         </rewrite>
-                       </GigabitEthernet>
-                       <GigabitEthernet>
-                         <id>{$PE-PORT-1}.{$SVLAN-ID}</id>
-                         <mode>l2transport</mode>
-                         <description>[UNI-N] [$CEDD Name] [{$CUSTOMER-NAME}] [$Kundennummer($Service-ID)]</description>
-                         <encapsulation>
-                           <dot1q>
-                             <vlan-id>{$SVLAN-ID}</vlan-id>
-                           </dot1q>
-                         </encapsulation>
-                         <rewrite>
-                           <ingress>
-                             <tag>
-                               <pop>1</pop>
-                               <mode>symmetric</mode>
-                             </tag>
-                           </ingress>
-                         </rewrite>
-                         <l2protocol>
-                           <cpsv>tunnel</cpsv>
-                         </l2protocol>
-                       </GigabitEthernet>
-                     </GigabitEthernet-subinterface>
-                   </interface>
-                   <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
-                     <evi>
-                       <id>49100</id>
-                       <bgp>
-                         <rd>65004:149172</rd>
-                         <route-target>
-                           <import foreach="{/link/route-target/rt-import}">
-                             <name>{$RT_IMPORT}</name>
-                           </import>
-                           <export tags="merge" foreach="{/link/route-target/rt-export}">
-                             <name>{$RT_EXPORT}</name>
-                           </export>
-                         </route-target>
-                       </bgp>
-                     </evi>
-                   </evpn>
                    <l2vpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <bridge>
                        <group>
@@ -144,7 +28,7 @@
                              </limit>
                            </mac>
                            <interface>
-                             <name>{/link/interface-type}{$PE-PORT-1}.{$SVLAN-ID}</name>
+                             <name>{/eline/link/interface-type}{$PE-PORT-1}.{$SVLAN-ID}</name>
                            </interface>
                            <pbb>
                              <edge>

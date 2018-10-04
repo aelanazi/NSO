@@ -13,30 +13,58 @@ class ServiceCallbacks(Service):
     @Service.create
     def cb_create(self, tctx, root, service, proplist):
         self.log.info('Service create(service=', service._path, ')')
-        
+
+        serv_type = service.service_type
+        serv = str(serv_type)
+        self.log.info('check type ', serv_type, serv)
+
+	    #serv_eline = "E-Line"
+	    #serv_elan = "E-Lan"
+	    #serv_etree = "E-Tree"        
         customer_name = service.customer_name
         evi = service.evi
+        
+        self.log.info("Global Service Type ", serv_type)
 
         links_data = []
-        rt_import_list = []
-        rt_export_list = []
-
-        for link in service.link:
+        Bundle = "false"
+        agg_idx = str(1)
+        for link in service.eline.link:
             link_data = {'pe_device': link.pe_device}
-            link_data['pe_port_1'] = link.pe_port_1
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
-        for RT_IMPORT in link.route_target.rt_import:
-            self.log.info("Full list of dict: ", RT_IMPORT.asn_ip)
-            if RT_IMPORT.asn_ip not in rt_import_list:
-                rt_import_list1 = {'route_target_import': RT_IMPORT.asn_ip}
-                rt_import_list.append(rt_import_list1)
-        for RT_EXPORT in link.route_target.rt_export:
-            self.log.info("Full list of dict: ", RT_EXPORT.asn_ip)
-            if RT_EXPORT.asn_ip not in rt_export_list:
-                rt_export_list1 = {'route_target_export': RT_EXPORT.asn_ip}
-                rt_export_list.append(rt_export_list1)
-        links_data.append(link_data)
+            if link.interface_type == "GigabitEthernet":
+                link_data['pe_port_1'] = link.pe_port.pe_gig_port
+            else:
+                link_data['pe_port_1'] = link.pe_port.pe_tengig_port
+        
+            if link.nni_redundancy == "Dual-PE":
+                link_data ['esi'] = link.Dual_PE.esi
+    
+            if link.nni_redundancy == "Protected":
+                Bundle = "true"
+                protect_name = "protect"
+                protect = (protect_name+agg_idx)
+                protect = []
+                for protect_loop in link.Bundle_Ether.pe_port:
+                    protect.append(protect_loop.pe_port)
+                link_data ['pe_port'] = protect
+            
+            rtx_name = "rtx"
+            rtx = (rtx_name+agg_idx)
+            rtx = []
+            for RT_EXPORT in service.eline.route_target.rt_export:
+                rtx.append(RT_EXPORT.asn_ip)
+            link_data ['RT_EXPORT'] = rtx
+            rtm_name = "rtx"
+            rtm = (rtm_name+agg_idx)
+            rtm = []
+            for RT_IMPORT in service.eline.route_target.rt_import:
+                rtm.append(RT_IMPORT.asn_ip)
+            link_data ['RT_IMPORT'] = rtx
+
+            agg_idx += str(1)
+            links_data.append(link_data)
         
         self.log.info("Full list of dict: ", links_data)
         self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
@@ -44,21 +72,26 @@ class ServiceCallbacks(Service):
         for index, link in enumerate(links_data):
             self.log.info('Configuring device {}'.format(link['pe_device']))
             vars = ncs.template.Variables()
+            template = ncs.template.Template(service)
             vars.add('CUSTOMER-NAME', customer_name)
             vars.add('EVI', evi)
             vars.add('PE-DEVICE', link['pe_device'])
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
-        for index, link1 in enumerate(rt_import_list):
-            vars.add('RT_IMPORT', link1['route_target_import'])
-        for index, link2 in enumerate(rt_export_list):
-            vars.add('RT_EXPORT', link2['route_target_export'])
-            template = ncs.template.Template(service)
             template.apply('pbb-evpn-base', vars)
 
+            if Bundle == "true":
+                for x in link['pe_port']:
+                    vars.add('PE-PORT', x)
+                    template.apply('pbb-evpn-lag-loop', vars)
 
-
+            for rtx in link['RT_EXPORT']:
+                vars.add('RT_EXPORT', rtx)
+                for rtm in link['RT_IMPORT']:
+                    vars.add('RT_IMPORT', rtm)
+                    template.apply('pbb-evpn-rt-loop', vars)
+            
 
     # The pre_modification() and post_modification() callbacks are optional,
     # and are invoked outside FASTMAP. pre_modification() is invoked before

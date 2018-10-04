@@ -18,12 +18,7 @@ module pbb-evpn {
 
   description
     "PBB-EVPN RFS Service";
-
-  revision 2018-09-28 {
-    description
-      "added services logic and corrected interface selection";
-  }
-
+ 
   revision 2018-09-23 {
     description
       "working vision.";
@@ -55,18 +50,18 @@ module pbb-evpn {
       description "instance type Point-to-Point, multipoint-to-multipoint, Rooted-multipoint" ;
       mandatory true;
       type enumeration {
-        enum E-Line;
-        enum E-Lan;
-        enum E-Tree;
+        enum eline;
+        enum elan;
+        enum etree;
       }
     }
 
     leaf evi {
+      description "EVPN Instance ID, Country DE allowed range 49,000 – 49,999, For IA Connected=49102, Static:49103";
       type uint16 {
         range "49000..49999";
         }
-        description "EVPN Instance ID, Country DE allowed range 49,000 – 49,999, For IA Connected=49102, Static:49103";
-        }
+      }
     
     leaf customer-name {
       tailf:info "Customer Name";
@@ -76,12 +71,18 @@ module pbb-evpn {
 
 
     container eline {
-      when "(../service-type = 'E-Line')";
+      tailf:cli-add-mode;
+      when "(../service-type = 'eline')";
+       
+      container route-target {
+          tailf:info "Specify Target VPN Extended Communities";
+          uses route-target-grouping;
+          }
 
-    list link {
-      tailf:info "PE-CE Attachment Point";
-      key link-id;
-      max-elements 2;
+      list link {
+        tailf:info "PE-CE Attachment Point";
+        key link-id;
+        max-elements 2;
 
       leaf link-id {
         tailf:info "Link ID";
@@ -115,22 +116,22 @@ module pbb-evpn {
         }
       }
 
-        leaf interface-type {
-          type enumeration {
-            enum GigabitEthernet;
-            enum TenGigabitEthernet;
-            }
-          default GigabitEthernet;
+      leaf interface-type {
+        type enumeration {
+          enum GigabitEthernet;
+          enum TenGigabitEthernet;
           }
+          default GigabitEthernet;
+        }
         
-        container pe-port {
-          leaf pe-gig-port {
-            tailf:info "Customer Facing Interface";
-            when "(../../interface-type = 'GigabitEthernet')";
-            type leafref {
-              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+      container pe-port {
+        tailf:cli-add-mode;
+        leaf pe-gig-port {
+          tailf:info "Customer Facing Interface";
+          when "(../../interface-type = 'GigabitEthernet')";
+          type leafref {
+            path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            mandatory true;
             //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
@@ -141,59 +142,63 @@ module pbb-evpn {
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            mandatory true;
             //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
             }
           }
 
-          container Bundle-Ether {
-            when "../nni-redundancy = 'Protected'";
-              
-              leaf pe-port-2 {
-                tailf:info "Customer Facing Interface";
-                type leafref {
-                  path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
-                  }
-                mandatory true;
-                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-                //error-message "Interface is already used by another service, please make sure to pick free port.";
-                
-              }
-          }
-
-          container Dual-PE {
-            when "../nni-redundancy = 'Dual-PE'";
-            
-
-            leaf esi  {
-              tailf:info "Ethernet Segment Identifier";
-              type string {
-                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
-                }
-              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
-              }
-          }
-
-        leaf nni-redundancy {
-          type enumeration {
-            enum None;
-            enum Protected; 
-            enum Dual-PE;
+      leaf nni-redundancy {
+        type enumeration {
+          enum None;
+          enum Protected; 
+          enum Dual-PE;
           }
           default None;
         }
 
-        container route-target {
-          tailf:info "Specify Target VPN Extended Communities";
-          uses route-target-grouping;
+      container Bundle-Ether {
+        when "../nni-redundancy = 'Protected'";
+
+        list pe-port {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+            mandatory true;
+                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+                //error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
           }
         }
+
+        container Dual-PE {
+            when "../nni-redundancy = 'Dual-PE'";
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+'{
+                error-message "ESI is out of range please allocate within the following range: 0300.4900.0000 – 0300.4900.ffff";
+                }
+              }
+              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
+              }
+          }
+
       }
-  
- container elan {
-      when "(../service-type = 'E-Lan')";
+    }
+ 
+  container elan {
+    when "(../service-type = 'elan')";
+
+      container route-target {
+        tailf:info "Specify Target VPN Extended Communities";
+        uses route-target-grouping;
+        }
 
     list link {
       tailf:info "PE-CE Attachment Point";
@@ -232,23 +237,22 @@ module pbb-evpn {
         }
       }
 
-        leaf interface-type {
-          type enumeration {
-            enum GigabitEthernet;
-            enum TenGigabitEthernet;
-            }
-          default GigabitEthernet;
+      leaf interface-type {
+        type enumeration {
+          enum GigabitEthernet;
+          enum TenGigabitEthernet;
           }
+          default GigabitEthernet;
+        }
         
-
-        container pe-port {
-          leaf pe-gig-port {
-            tailf:info "Customer Facing Interface";
-            when "(../../interface-type = 'GigabitEthernet')";
-            type leafref {
-              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+      container pe-port {
+        tailf:cli-add-mode;
+        leaf pe-gig-port {
+          tailf:info "Customer Facing Interface";
+          when "(../../interface-type = 'GigabitEthernet')";
+          type leafref {
+            path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            mandatory true;
             //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
@@ -259,59 +263,59 @@ module pbb-evpn {
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            mandatory true;
             //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
             }
           }
-          
-          container Bundle-Ether {
-            when "../nni-redundancy = 'Protected'";
-              
-              leaf pe-port-2 {
-                tailf:info "Customer Facing Interface";
-                type leafref {
-                  path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
-                  }
-                mandatory true;
-                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-                //error-message "Interface is already used by another service, please make sure to pick free port.";
-                
-              }
-          }
 
-          container Dual-PE {
-            when "../nni-redundancy = 'Dual-PE'";
-            
-
-            leaf esi  {
-              tailf:info "Ethernet Segment Identifier";
-              type string {
-                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
-                }
-              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
-              }
-          }
-
-        leaf nni-redundancy {
-          type enumeration {
-            enum None;
-            enum Protected; 
-            enum Dual-PE;
+      leaf nni-redundancy {
+        type enumeration {
+          enum None;
+          enum Protected; 
+          enum Dual-PE;
           }
           default None;
         }
 
-        container route-target {
-          tailf:info "Specify Target VPN Extended Communities";
-          uses route-target-grouping;
+      container Bundle-Ether {
+        when "../nni-redundancy = 'Protected'";
+
+        list pe-port {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
+            }
+            mandatory true;
+                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
+                //error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
           }
         }
-      }
 
-container etree {
-      when "(../service-type = 'E-Tree')";
+        container Dual-PE {
+            when "../nni-redundancy = 'Dual-PE'";
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+'{
+                error-message "ESI is out of range please allocate within the following range: 0300.4900.0000 – 0300.4900.ffff";
+                }
+              }
+              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
+              }
+          }
+
+        }
+      }
+   
+
+  container etree {
+      when "(../service-type = 'etree')";
 
     list link {
       tailf:info "PE-CE Attachment Point";
@@ -337,9 +341,9 @@ container etree {
           tailf:info "define CE type root or leaf eq hub or spoke";
           type enumeration {
             enum hub;
-            enum spoke; 
-        }
-        }
+            enum spoke;
+            }
+          }
 
       leaf pe-device {
         tailf:info "Edge-PE where service will be configured";
@@ -358,15 +362,14 @@ container etree {
         }
       }
 
-        leaf interface-type {
-          type enumeration {
-            enum GigabitEthernet;
-            enum TenGigabitEthernet;
-            }
-          default GigabitEthernet;
+      leaf interface-type {
+        type enumeration {
+          enum GigabitEthernet;
+          enum TenGigabitEthernet;
           }
+          default GigabitEthernet;
+        }
         
-
         container pe-port {
           leaf pe-gig-port {
             tailf:info "Customer Facing Interface";
@@ -379,23 +382,21 @@ container etree {
             //error-message "Interface is already used by another service, please make sure to pick free port.";
             //}
             }
-          leaf pe-tengig-port {
-            tailf:info "Customer Facing Interface";
-            when "(../../interface-type = 'TenGigabitEthernet')";
-            type leafref {
-              path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
-            }
-            mandatory true;
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            leaf pe-tengig-port {
+              tailf:info "Customer Facing Interface";
+              when "(../../interface-type = 'TenGigabitEthernet')";
+              type leafref {
+                path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+              }
+              mandatory true;
+              //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
+              //error-message "Interface is already used by another service, please make sure to pick free port.";
+              //}
             }
           }
       
-          
           container Bundle-Ether {
             when "../nni-redundancy = 'Protected'";
-              
               leaf pe-port-2 {
                 tailf:info "Customer Facing Interface";
                 type leafref {
@@ -404,38 +405,36 @@ container etree {
                 mandatory true;
                 //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
                 //error-message "Interface is already used by another service, please make sure to pick free port.";
-                
-              }
-          }
+                }
+            }
 
           container Dual-PE {
             when "../nni-redundancy = 'Dual-PE'";
             
 
-            leaf esi  {
-              tailf:info "Ethernet Segment Identifier";
-              type string {
-                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
-                }
+          leaf esi  {
+            tailf:info "Ethernet Segment Identifier";
+            type string {
+              pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
+              }
               description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
               }
+            }
+          leaf nni-redundancy {
+            type enumeration {
+              enum None;
+              enum Protected; 
+              enum Dual-PE;
+            }
+            default None;
           }
-
-        leaf nni-redundancy {
-          type enumeration {
-            enum None;
-            enum Protected; 
-            enum Dual-PE;
-          }
-          default None;
-        }
 
         container route-target {
           tailf:info "Specify Target VPN Extended Communities";
           uses route-target-grouping;
-          }
         }
       }
+    }
   
 
 

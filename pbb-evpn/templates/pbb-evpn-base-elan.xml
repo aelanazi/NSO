@@ -1,0 +1,46 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+  <device>
+      <name>{$PE-DEVICE}</name>
+                 <config>
+                   <l2vpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
+                     <bridge>
+                       <group>
+                         <group-name>PBB_EVPN_CORE</group-name>
+                         <bridge-domain>
+                           <bridge-domain-name>PBB_EVPN_CORE-{$EVI}</bridge-domain-name>
+                           <pbb>
+                             <core>
+                               <evpn>
+                                 <evi>{$EVI}</evi>
+                               </evpn>
+                             </core>
+                           </pbb>
+                         </bridge-domain>
+                       </group>
+                       <group>
+                         <group-name>PBB_EVPN_EDGE</group-name>
+                         <bridge-domain>
+                           <bridge-domain-name>PBB_EVPN_EDGE-{$EVI}</bridge-domain-name>
+                           <mac>
+                             <limit>
+                               <maximum>4095</maximum>
+                             </limit>
+                           </mac>
+                           <interface>
+                             <name>{/elan/link/interface-type}{$PE-PORT-1}.{$SVLAN-ID}</name>
+                           </interface>
+                           <pbb>
+                             <edge>
+                               <i-sid>{$EDGE-I-SID}</i-sid>
+                               <core-bridge>PBB_EVPN_CORE-{$EVI}</core-bridge>
+                             </edge>
+                           </pbb>
+                         </bridge-domain>
+                       </group>
+                     </bridge>
+                   </l2vpn>
+                 </config>
+               </device>
+        </devices>
+</config-template>

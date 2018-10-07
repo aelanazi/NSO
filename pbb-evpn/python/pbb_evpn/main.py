@@ -43,25 +43,33 @@ class ServiceCallbacks(Service):
         customer_name = service.customer_name
         evi = service.evi
         links_data = []
-        Bundle = "false"
         agg_idx = str(1)
         for link in service.eline.link:
             link_data = {'pe_device': link.pe_device}
+            link_data['Bundle'] = "false"
+            link_data['gig'] = "false"
+            link_data['tengig'] = "false"
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
+                link_data['gig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
-            else:
+                link_data['pe_port_type'] = "GigabitEthernet"
+            
+            if link.interface_type == "TenGigabitEthernet":
+                link_data['tengig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_tengig_port
-        
+                link_data['pe_port_type'] = "TenGigabitEthernet"
+
             if link.nni_redundancy == "Dual-PE":
                 link_data ['esi'] = link.Dual_PE.esi
     
             if link.nni_redundancy == "Protected":
-                Bundle = "true"
+                link_data['Bundle'] = "true"
                 protect_name = "protect"
                 protect = (protect_name+agg_idx)
                 protect = []
+                link_data['pe_port_type'] = "Bundle-Ether"
                 for protect_loop in link.Bundle_Ether.pe_port:
                     protect.append(protect_loop.pe_port)
                 link_data ['pe_port'] = protect
@@ -83,7 +91,7 @@ class ServiceCallbacks(Service):
             links_data.append(link_data)
             self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
         
-        self.log.info("Full list of dict: ", links_data)
+        #self.log.info("Full list of dict: ", links_data)
             
         for index, link in enumerate(links_data):
             self.log.info('Configuring device {}'.format(link['pe_device']))
@@ -95,33 +103,56 @@ class ServiceCallbacks(Service):
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
+            if link['pe_port_type'] == "Bundle-Ether":
+                vars.add('INT-TYPE', '1')
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+                
+            else:
+                vars.add('INT-TYPE', link['pe_port_1'])
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+
             template.apply('pbb-evpn-base-eline', vars)
 
-            if Bundle == "true":
+            if link['Bundle'] == "true":
                 for x in link['pe_port']:
                     vars.add('PE-PORT', x)
-                    template.apply('pbb-evpn-lag-loop-eline', vars)
+                    if link['gig'] == "true":
+                        template.apply('pbb-evpn-lag-loop-eline-gig', vars)
+                        
+                    if link['tengig'] == "true":
+                        template.apply('pbb-evpn-lag-loop-eline-tengig', vars)
+
+            else:
+                template.apply('pbb-evpn-interface-eline', vars)
 
             for rtx in link['RT_EXPORT']:
                 vars.add('RT_EXPORT', rtx)
                 for rtm in link['RT_IMPORT']:
                     vars.add('RT_IMPORT', rtm)
                     template.apply('pbb-evpn-rt-loop-eline', vars)
+                    
 
     def config_elan(self, root, service):
         customer_name = service.customer_name
         evi = service.evi
         links_data = []
         Bundle = "false"
+        gig = "false"
+        tengig = "false"
         agg_idx = str(1)
         for link in service.elan.link:
             link_data = {'pe_device': link.pe_device}
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
+                gig = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
-            else:
+                link_data['pe_port_type'] = "GigabitEthernet"
+
+            if link.interface_type == "TenGigabitEthernet":
+                tengig = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_tengig_port
+
         
             if link.nni_redundancy == "Dual-PE":
                 link_data ['esi'] = link.Dual_PE.esi
@@ -131,6 +162,7 @@ class ServiceCallbacks(Service):
                 protect_name = "protect"
                 protect = (protect_name+agg_idx)
                 protect = []
+                link_data['pe_port_type'] = "Bundle-Ether"
                 for protect_loop in link.Bundle_Ether.pe_port:
                     protect.append(protect_loop.pe_port)
                 link_data ['pe_port'] = protect
@@ -164,12 +196,22 @@ class ServiceCallbacks(Service):
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
+            #vars.add('PE-PORT-TYPE', link['pe_port_type'])
+            if link['pe_port_type'] == "Bundle-Ether":
+                vars.add('INT-TYPE', '1')
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+            else:
+                vars.add('INT-TYPE', link['pe_port_1'])
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
             template.apply('pbb-evpn-base-elan', vars)
 
             if Bundle == "true":
                 for x in link['pe_port']:
                     vars.add('PE-PORT', x)
-                    template.apply('pbb-evpn-lag-loop-elan', vars)
+                    if gig == "true":
+                        template.apply('pbb-evpn-lag-loop-elan-gig', vars)
+                    if tengig == "true":
+                        template.apply('pbb-evpn-lag-loop-elan-tengig', vars)
 
             for rtx in link['RT_EXPORT']:
                 vars.add('RT_EXPORT', rtx)
@@ -183,15 +225,22 @@ class ServiceCallbacks(Service):
         evi = service.evi
         links_data = []
         Bundle = "false"
+        gig = "false"
+        tengig = "false"
         agg_idx = str(1)
         for link in service.etree.link:
             link_data = {'pe_device': link.pe_device}
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
+                gig = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
-            else:
+                link_data['pe_port_type'] = "GigabitEthernet"
+
+            if link.interface_type == "TenGigabitEthernet":
+                tengig = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_tengig_port
+
         
             if link.nni_redundancy == "Dual-PE":
                 link_data ['esi'] = link.Dual_PE.esi
@@ -201,6 +250,7 @@ class ServiceCallbacks(Service):
                 protect_name = "protect"
                 protect = (protect_name+agg_idx)
                 protect = []
+                link_data['pe_port_type'] = "Bundle-Ether"
                 for protect_loop in link.Bundle_Ether.pe_port:
                     protect.append(protect_loop.pe_port)
                 link_data ['pe_port'] = protect
@@ -234,12 +284,22 @@ class ServiceCallbacks(Service):
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
+            if link['pe_port_type'] == "Bundle-Ether":
+                vars.add('INT-TYPE', '1')
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+            else:
+                vars.add('INT-TYPE', link['pe_port_1'])
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+
             template.apply('pbb-evpn-base-etree', vars)
 
             if Bundle == "true":
                 for x in link['pe_port']:
                     vars.add('PE-PORT', x)
-                    template.apply('pbb-evpn-lag-loop-etree', vars)
+                    if gig == "true":
+                        template.apply('pbb-evpn-lag-loop-elan-gig', vars)
+                    if tengig == "true":
+                        template.apply('pbb-evpn-lag-loop-elan-tengig', vars)
 
             for rtx in link['RT_EXPORT']:
                 vars.add('RT_EXPORT', rtx)

@@ -5,9 +5,9 @@
                  <config>
                    <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <evi>
-                       <id>49100</id>
+                       <id>{$EVI}</id>
                        <bgp>
-                         <rd>65004:149172</rd>
+                         <rd>65004:{$EVI}</rd>
                          <route-target>
                            <import tags="merge" foreach="{/etree/link/route-target/rt-import}">
                              <name>{$RT_IMPORT}</name>

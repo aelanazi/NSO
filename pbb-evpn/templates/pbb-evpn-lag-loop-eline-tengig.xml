@@ -5,16 +5,16 @@
                  <config>
                    <interface xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <Bundle-Ether>
-                       <id>1</id>
+                       <id>{$INT-TYPE}</id>
                        <description>Test</description>
                      </Bundle-Ether>
                      <Bundle-Ether-subinterface>
                        <Bundle-Ether>
-                         <id>1.199</id>
+                         <id>{$INT-TYPE}.199</id>
                          <description>MGMT</description>
                        </Bundle-Ether>
                        <Bundle-Ether>
-                         <id>1.{$SVLAN-ID}</id>
+                         <id>{$INT-TYPE}.{$SVLAN-ID}</id>
                           <mode>l2transport</mode>
                          <description>[UNI-N] [$CEDD Name] [{$CUSTOMER-NAME}] [$Kundennummer($Service-ID)]</description>
                          <encapsulation>
@@ -39,7 +39,7 @@
                        <id>{$PE-PORT-1}</id>
                        <bundle>
                          <id>
-                           <id-value>1</id-value>
+                           <id-value>{$INT-TYPE}</id-value>
                          </id>
                        </bundle>
                      </TenGigE>
@@ -47,7 +47,7 @@
                        <id>{$PE-PORT}</id>
                        <bundle>
                          <id>
-                           <id-value>1</id-value>
+                           <id-value>{$INT-TYPE}</id-value>
                          </id>
                        </bundle>
                      </TenGigE>

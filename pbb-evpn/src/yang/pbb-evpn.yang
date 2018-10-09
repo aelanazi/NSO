@@ -193,6 +193,7 @@ module pbb-evpn {
     }
  
   container elan {
+    tailf:cli-add-mode;
     when "(../service-type = 'elan')";
 
       container route-target {
@@ -315,7 +316,15 @@ module pbb-evpn {
    
 
   container etree {
+    tailf:cli-add-mode;
       when "(../service-type = 'etree')";
+    
+
+    leaf spoke-route-target {
+      type asn-ip-type {
+        tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+        }
+      }
 
     list link {
       tailf:info "PE-CE Attachment Point";
@@ -337,13 +346,23 @@ module pbb-evpn {
           }
         }
 
-        leaf ce-type {
-          tailf:info "define CE type root or leaf eq hub or spoke";
-          type enumeration {
-            enum hub;
-            enum spoke;
-            }
+      leaf ce-type {
+        tailf:info "define CE type root or leaf eq hub or spoke";
+        //mandatory true;
+        type enumeration {
+          enum hub;
+          enum spoke;
           }
+          default spoke;
+        }
+
+      leaf hub-route-target {
+        tailf:info "ASN:nn or IP-address:nn; Target VPN Extended Community exported by roots to all leaves";
+        when "(../ce-type = 'hub')";
+        type asn-ip-type {
+          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+        }
+      }
 
       leaf pe-device {
         tailf:info "Edge-PE where service will be configured";
@@ -410,16 +429,16 @@ module pbb-evpn {
 
           container Dual-PE {
             when "../nni-redundancy = 'Dual-PE'";
-            
-
-          leaf esi  {
-            tailf:info "Ethernet Segment Identifier";
-            type string {
-              pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
+  
+            leaf esi  {
+              tailf:info "Ethernet Segment Identifier";
+              type string {
+                pattern '[0300]+\.[4900]+\.[0-9a-fA-F]+';
               }
-              description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
-              }
+                description "Ethernet Segment Identifier, Country DE ESI Range: 0300.4900.0000 – 0300.4900.ffff";
             }
+          }
+          
           leaf nni-redundancy {
             type enumeration {
               enum None;
@@ -428,11 +447,6 @@ module pbb-evpn {
             }
             default None;
           }
-
-        container route-target {
-          tailf:info "Specify Target VPN Extended Communities";
-          uses route-target-grouping;
-        }
       }
     }
   

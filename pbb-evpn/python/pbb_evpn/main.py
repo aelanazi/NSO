@@ -235,6 +235,8 @@ class ServiceCallbacks(Service):
             link_data['Bundle'] = "false"
             link_data['gig'] = "false"
             link_data['tengig'] = "false"
+            link_data['hub'] = "false"
+            link_data['spoke'] = "false"
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
@@ -259,7 +261,16 @@ class ServiceCallbacks(Service):
                 for protect_loop in link.Bundle_Ether.pe_port:
                     protect.append(protect_loop.pe_port)
                 link_data ['pe_port'] = protect
-            
+
+            if link.ce_type == "hub":
+                link_data['hub'] = "true"
+                #link_data['HUB-ROUTE-TARGET'] = link.hub_route_target
+            if link.ce_type == "spoke":
+                link_data['spoke'] = "true"
+                #link_data['SPOKE-ROUTE-TARGET'] = link.spoke_route_target
+
+
+            """
             rtx_name = "rtx"
             rtx = (rtx_name+agg_idx)
             rtx = []
@@ -272,9 +283,11 @@ class ServiceCallbacks(Service):
             for RT_IMPORT in service.etree.route_target.rt_import:
                 rtm.append(RT_IMPORT.asn_ip)
             link_data ['RT_IMPORT'] = rtx
+            """
 
             agg_idx += str(1)
             links_data.append(link_data)
+            self.log.info('Show full list ', link_data)
             self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
             
         for index, link in enumerate(links_data):
@@ -309,11 +322,17 @@ class ServiceCallbacks(Service):
             else:
                 template.apply('pbb-evpn-interface-etree', vars)
 
-            for rtx in link['RT_EXPORT']:
-                vars.add('RT_EXPORT', rtx)
-                for rtm in link['RT_IMPORT']:
-                    vars.add('RT_IMPORT', rtm)
-                    template.apply('pbb-evpn-rt-loop-etree', vars)
+            if link['hub'] == "true":
+                #vars.add('RT_EXPORT', link['HUB-ROUTE-TARGET'])
+                self.log.info("applying pbb-evpn-rt-hub-loop-etree", vars)
+                #vars.add('RT_IMPORT', link_data['SPOKE-ROUTE-TARGET'])
+                template.apply('pbb-evpn-rt-hub-loop-etree', vars)
+            if link['spoke'] == "true":
+                #vars.add('RT_EXPORT', link['SPOKE-ROUTE-TARGET'])
+                #self.log.info(link_data['HUB-ROUTE-TARGET'])
+                #vars.add('RT_IMPORT', link_data['HUB-ROUTE-TARGET'])
+                self.log.info("applying pbb-evpn-rt-spoke-loop-etree", vars)
+                template.apply('pbb-evpn-rt-spoke-loop-etree', vars)
             
 
 

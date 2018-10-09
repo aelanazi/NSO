@@ -9,11 +9,11 @@
                        <bgp>
                          <rd>65004:{$EVI}</rd>
                          <route-target>
-                           <import tags="merge" foreach="{/etree/link/route-target/rt-import}">
-                             <name>{$RT_IMPORT}</name>
+                           <import tags="merge" foreach="{/etree/link/hub-route-target}">
+                             <name>{/etree/link/hub-route-target}</name>
                            </import>
-                           <export tags="merge" foreach="{/etree/link/route-target/rt-export}">
-                             <name>{$RT_EXPORT}</name>
+                           <export>
+                             <name>{/etree/link/spoke-route-target}</name>
                            </export>
                          </route-target>
                        </bgp>
@@ -23,3 +23,5 @@
                </device>
         </devices>
 </config-template>
+
+

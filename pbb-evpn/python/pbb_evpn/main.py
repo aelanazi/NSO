@@ -267,7 +267,7 @@ class ServiceCallbacks(Service):
                 #link_data['HUB-ROUTE-TARGET'] = link.hub_route_target
             if link.ce_type == "spoke":
                 link_data['spoke'] = "true"
-                #link_data['SPOKE-ROUTE-TARGET'] = link.spoke_route_target
+                link_data['SPOKE-ROUTE-TARGET'] = link.spoke_route_target
 
 
             """
@@ -324,14 +324,14 @@ class ServiceCallbacks(Service):
 
             if link['hub'] == "true":
                 #vars.add('RT_EXPORT', link['HUB-ROUTE-TARGET'])
-                self.log.info("applying pbb-evpn-rt-hub-loop-etree", vars)
+                #self.log.info("applying pbb-evpn-rt-hub-loop-etree", vars)
                 #vars.add('RT_IMPORT', link_data['SPOKE-ROUTE-TARGET'])
                 template.apply('pbb-evpn-rt-hub-loop-etree', vars)
             if link['spoke'] == "true":
-                #vars.add('RT_EXPORT', link['SPOKE-ROUTE-TARGET'])
+                vars.add('RT_EXPORT', link['SPOKE-ROUTE-TARGET'])
                 #self.log.info(link_data['HUB-ROUTE-TARGET'])
                 #vars.add('RT_IMPORT', link_data['HUB-ROUTE-TARGET'])
-                self.log.info("applying pbb-evpn-rt-spoke-loop-etree", vars)
+                #self.log.info("applying pbb-evpn-rt-spoke-loop-etree", vars)
                 template.apply('pbb-evpn-rt-spoke-loop-etree', vars)
             
 

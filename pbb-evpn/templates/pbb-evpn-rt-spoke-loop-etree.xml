@@ -13,7 +13,7 @@
                              <name>{/etree/link/hub-route-target}</name>
                            </import>
                            <export>
-                             <name>{/etree/link/spoke-route-target}</name>
+                             <name>{$RT_EXPORT}</name>
                            </export>
                          </route-target>
                        </bgp>

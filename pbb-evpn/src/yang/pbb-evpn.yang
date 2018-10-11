@@ -318,23 +318,7 @@ module pbb-evpn {
   container etree {
     tailf:cli-add-mode;
       when "(../service-type = 'etree')";
-    
-      leaf hub-route-target {
-        tailf:info "ASN:nn or IP-address:nn; Target VPN Extended Community exported by roots to all leaves";
-        when "(/link/ce-type = 'hub')";
-        type asn-ip-type {
-          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
-        }
-      }
-
-      leaf spoke-route-target {
-        tailf:info "ASN:nn or IP-address:nn; Target VPN Extended Community exported by roots to all leaves";
-        when "(/link/ce-type = 'spoke')";
-        type asn-ip-type {
-          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
-          }
-        }
-    
+   
     list link {
       tailf:info "PE-CE Attachment Point";
       key link-id;
@@ -363,6 +347,22 @@ module pbb-evpn {
           enum spoke;
           }
           default spoke;
+        }
+
+      leaf hub-route-target {
+        tailf:info "ASN:nn or IP-address:nn; Target VPN Extended Community exported by roots to all leaves";
+        when "(../ce-type = 'hub')";
+        type asn-ip-type {
+          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+          }
+        }
+
+      leaf spoke-route-target {
+        tailf:info "ASN:nn or IP-address:nn; Target VPN Extended Community exported by roots to all leaves";
+        when "(../ce-type = 'spoke')";
+        type asn-ip-type {
+          tailf:info "ASN:nn or IP-address:nn;;Target VPN Extended Community";
+          }
         }
 
       leaf pe-device {

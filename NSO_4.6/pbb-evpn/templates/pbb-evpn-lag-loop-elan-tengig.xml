@@ -1,0 +1,58 @@
+<config-template xmlns="http://tail-f.com/ns/config/1.0">
+  <devices xmlns="http://tail-f.com/ns/ncs">
+               <device>
+                  <name>{$PE-DEVICE}</name>
+                 <config>
+                   <interface xmlns="http://tail-f.com/ned/cisco-ios-xr">
+                     <Bundle-Ether>
+                       <id>{$INT-TYPE}</id>
+                       <description>Test</description>
+                     </Bundle-Ether>
+                     <Bundle-Ether-subinterface>
+                       <Bundle-Ether>
+                         <id>{$INT-TYPE}.199</id>
+                         <description>MGMT</description>
+                       </Bundle-Ether>
+                       <Bundle-Ether>
+                         <id>{$INT-TYPE}.{$SVLAN-ID}</id>
+                          <mode>l2transport</mode>
+                         <description>[UNI-N] [$CEDD Name] [{$CUSTOMER-NAME}] [$Kundennummer($Service-ID)]</description>
+                         <encapsulation>
+                           <dot1q>
+                             <vlan-id>{$SVLAN-ID}</vlan-id>
+                           </dot1q>
+                         </encapsulation>
+                         <rewrite>
+                           <ingress>
+                             <tag>
+                               <pop>1</pop>
+                               <mode>symmetric</mode>
+                             </tag>
+                           </ingress>
+                         </rewrite>
+                         <l2protocol>
+                           <cpsv>tunnel</cpsv>
+                         </l2protocol>
+                       </Bundle-Ether>
+                     </Bundle-Ether-subinterface>
+                     <TenGigE>
+                       <id>{$PE-PORT-1}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                         </id>
+                       </bundle>
+                     </TenGigE>
+                     <TenGigE tags="merge" foreach="{/elan/link/Bundle-Ether/pe-port/pe-port}">
+                       <id>{$PE-PORT}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                         </id>
+                       </bundle>
+                     </TenGigE>
+                   </interface>
+                 </config>
+               </device>
+  </devices>
+</config-template>

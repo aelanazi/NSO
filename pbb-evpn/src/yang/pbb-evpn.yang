@@ -3,10 +3,6 @@ module pbb-evpn {
   namespace "http://example.com/pbb-evpn";
   prefix pbb-evpn;
 
-  //import ietf-inet-types {
-  //  prefix inet;
-  //}
-  
   import tailf-common {
     prefix tailf;
   }
@@ -14,28 +10,32 @@ module pbb-evpn {
     prefix ncs;
   }
   
-  import tailf-ned-cisco-ios-xr { prefix cisco-ios-xr; }
+  import tailf-ned-cisco-ios-xr { 
+    prefix cisco-ios-xr; 
+  }
 
   description
     "PBB-EVPN RFS Service";
+   
+  revision 2018-10-11 {
+    description
+      "fully working version draft 0.9.";
+  }
  
   revision 2018-09-23 {
     description
-      "working vision.";
+      "working draft 0.2.";
   }
 
   revision 2018-09-22 {
     description
-      "Initial revision.";
+      "Initial vision 0.1";
   }
-
-
 
  augment /ncs:services {
    list pbb-evpn {
      description "This is an RFS skeleton service";
      key vpn-id;
-     //unique vpn-id;
 
     leaf vpn-id {
       tailf:info "VPN Service Instance id";
@@ -69,15 +69,21 @@ module pbb-evpn {
       type string;
     }
 
-
     container eline {
       tailf:cli-add-mode;
       when "(../service-type = 'eline')";
        
       container route-target {
           tailf:info "Specify Target VPN Extended Communities";
-          uses route-target-grouping;
-          }
+          uses route-target-grouping  {
+                refine rt-export {
+                    max-elements 1;
+                }
+                refine rt-import {
+                    max-elements 1;
+                }
+            }
+      }
 
       list link {
         tailf:info "PE-CE Attachment Point";
@@ -132,19 +138,19 @@ module pbb-evpn {
           type leafref {
             path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
             }
+          }
           leaf pe-tengig-port {
             tailf:info "Customer Facing Interface";
             when "(../../interface-type = 'TenGigabitEthernet')";
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
             }
           }
 
@@ -170,8 +176,9 @@ module pbb-evpn {
             path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
             mandatory true;
-                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-                //error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
         }
@@ -189,8 +196,8 @@ module pbb-evpn {
               }
           }
 
-      }
     }
+  }
  
   container elan {
     tailf:cli-add-mode;
@@ -254,9 +261,9 @@ module pbb-evpn {
           type leafref {
             path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
             }
           leaf pe-tengig-port {
             tailf:info "Customer Facing Interface";
@@ -264,9 +271,9 @@ module pbb-evpn {
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
             }
           }
 
@@ -292,8 +299,9 @@ module pbb-evpn {
             path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
             mandatory true;
-                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-                //error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
         }
@@ -341,7 +349,6 @@ module pbb-evpn {
 
       leaf ce-type {
         tailf:info "define CE type root or leaf eq hub or spoke";
-        //mandatory true;
         type enumeration {
           enum hub;
           enum spoke;
@@ -398,9 +405,9 @@ module pbb-evpn {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
             mandatory true;
-            //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-            //error-message "Interface is already used by another service, please make sure to pick free port.";
-            //}
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
             }
             leaf pe-tengig-port {
               tailf:info "Customer Facing Interface";
@@ -409,24 +416,31 @@ module pbb-evpn {
                 path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
               }
               mandatory true;
-              //must "count(../../../pbb-evpn[customer-name != current()/../../customer-name]/link[pe-device= current()/../pe-device][pe-port-1=current()]) = 0" {
-              //error-message "Interface is already used by another service, please make sure to pick free port.";
-              //}
+              must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+              error-message "Interface is already used by another service, please make sure to pick free port.";
+              }
             }
           }
       
-          container Bundle-Ether {
-            when "../nni-redundancy = 'Protected'";
-              leaf pe-port-2 {
-                tailf:info "Customer Facing Interface";
-                type leafref {
-                  path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
-                  }
-                mandatory true;
-                //must "count(../../../../pbb-evpn[customer-name != current()/../../../customer-name]/link[pe-device= current()/../../pe-device][/../pe-port-2=current()]) = 0" {
-                //error-message "Interface is already used by another service, please make sure to pick free port.";
-                }
+      container Bundle-Ether {
+        when "../nni-redundancy = 'Protected'";
+
+        list pe-port {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
+            mandatory true;
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+        }
 
           container Dual-PE {
             when "../nni-redundancy = 'Dual-PE'";
@@ -450,8 +464,6 @@ module pbb-evpn {
       }
     }
   
-
-
   grouping route-target-grouping {
 
     list "rt-export" {

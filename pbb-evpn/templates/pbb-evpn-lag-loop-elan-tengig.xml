@@ -43,7 +43,7 @@
                          </id>
                        </bundle>
                      </TenGigE>
-                     <TenGigE tags="merge" foreach="{/elan/link/Bundle-Ether/pe-port/pe-port}">
+                     <TenGigE tags="merge" foreach="{/elan/link/Bundle-Ether/pe-port-tengig/pe-port}">
                        <id>{$PE-PORT}</id>
                        <bundle>
                          <id>

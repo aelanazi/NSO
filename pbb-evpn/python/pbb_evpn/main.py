@@ -73,9 +73,16 @@ class ServiceCallbacks(Service):
                 protect = (protect_name+agg_idx)
                 protect = []
                 link_data['pe_port_type'] = "Bundle-Ether"
-                for protect_loop in link.Bundle_Ether.pe_port:
-                    protect.append(protect_loop.pe_port)
-                link_data ['pe_port'] = protect
+                if link_data['gig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+                if link_data['tengig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port_tengig:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+                    
+
             
             rtx_name = "rtx"
             rtx = (rtx_name+agg_idx)
@@ -92,6 +99,7 @@ class ServiceCallbacks(Service):
 
             agg_idx += str(1)
             links_data.append(link_data)
+            self.log.info('Show full list ', links_data)
             self.log.info('Normalizing data for device {} for Customer {}'.format(link_data['pe_device'], customer_name))
         
         
@@ -124,6 +132,7 @@ class ServiceCallbacks(Service):
                         
                     if link['tengig'] == "true":
                         template.apply('pbb-evpn-lag-loop-eline-tengig', vars)
+                        self.log.info('Show full list ', vars)
 
             else:
                 template.apply('pbb-evpn-interface-eline', vars)
@@ -165,9 +174,15 @@ class ServiceCallbacks(Service):
                 protect = (protect_name+agg_idx)
                 protect = []
                 link_data['pe_port_type'] = "Bundle-Ether"
-                for protect_loop in link.Bundle_Ether.pe_port:
-                    protect.append(protect_loop.pe_port)
-                link_data ['pe_port'] = protect
+                if link_data['gig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+                if link_data['tengig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port_tengig:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+
             
             rtx_name = "rtx"
             rtx = (rtx_name+agg_idx)
@@ -258,9 +273,15 @@ class ServiceCallbacks(Service):
                 protect = (protect_name+agg_idx)
                 protect = []
                 link_data['pe_port_type'] = "Bundle-Ether"
-                for protect_loop in link.Bundle_Ether.pe_port:
-                    protect.append(protect_loop.pe_port)
-                link_data ['pe_port'] = protect
+                if link_data['gig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+                if link_data['tengig'] == "true":
+                    for protect_loop in link.Bundle_Ether.pe_port_tengig:
+                        protect.append(protect_loop.pe_port)
+                    link_data['pe_port'] = protect
+                    
 
             if link.ce_type == "hub":
                 link_data['hub'] = "true"

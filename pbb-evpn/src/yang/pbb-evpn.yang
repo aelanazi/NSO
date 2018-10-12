@@ -173,6 +173,8 @@ module pbb-evpn {
         list pe-port {
         tailf:cli-suppress-mode;
         tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'GigabitEthernet')";
+        max-elements 7;
         key pe-port;
         leaf pe-port {
           tailf:info "Customer Facing Interface";
@@ -182,6 +184,24 @@ module pbb-evpn {
             mandatory true;
             }
                 must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+
+        list pe-port-tengig {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'TenGigabitEthernet')";
+        max-elements 7;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -296,6 +316,8 @@ module pbb-evpn {
         list pe-port {
         tailf:cli-suppress-mode;
         tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'GigabitEthernet')";
+        max-elements 7;
         key pe-port;
         leaf pe-port {
           tailf:info "Customer Facing Interface";
@@ -305,6 +327,24 @@ module pbb-evpn {
             mandatory true;
             }
                 must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+
+        list pe-port-tengig {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'TenGigabitEthernet')";
+        max-elements 7;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -432,6 +472,8 @@ module pbb-evpn {
         list pe-port {
         tailf:cli-suppress-mode;
         tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'GigabitEthernet')";
+        max-elements 7;
         key pe-port;
         leaf pe-port {
           tailf:info "Customer Facing Interface";
@@ -441,6 +483,24 @@ module pbb-evpn {
             mandatory true;
             }
                 must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                error-message "Interface is already used by another service, please make sure to pick free port.";
+            }
+          }
+
+        list pe-port-tengig {
+        tailf:cli-suppress-mode;
+        tailf:cli-delete-when-empty;
+        when "(../../interface-type = 'TenGigabitEthernet')";
+        max-elements 7;
+        key pe-port;
+        leaf pe-port {
+          tailf:info "Customer Facing Interface";
+          type leafref {
+            path "deref(../../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
+            }
+            mandatory true;
+            }
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }

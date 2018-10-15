@@ -116,8 +116,7 @@ class ServiceCallbacks(Service):
             vars.add('SVLAN-ID', link['svlan_id'])
             if link['pe_port_type'] == "Bundle-Ether":
                 vars.add('INT-TYPE', self.get_bundle_id(root, service, **link))
-                vars.add('PE-PORT-TYPE', link['pe_port_type'])
-                
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])                
             else:
                 vars.add('INT-TYPE', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
@@ -129,13 +128,15 @@ class ServiceCallbacks(Service):
                     vars.add('PE-PORT', x)
                     if link['gig'] == "true":
                         template.apply('pbb-evpn-lag-loop-eline-gig', vars)
-                        
+
                     if link['tengig'] == "true":
                         template.apply('pbb-evpn-lag-loop-eline-tengig', vars)
-                        self.log.info('Show full list ', vars)
 
             else:
-                template.apply('pbb-evpn-interface-eline', vars)
+                if link['gig'] == "true":
+                    template.apply('pbb-evpn-interface-gig', vars)
+                if link['tengig'] == "true":
+                    template.apply('pbb-evpn-interface-tengig', vars)
 
             for rtx in link['RT_EXPORT']:
                 vars.add('RT_EXPORT', rtx)
@@ -229,9 +230,12 @@ class ServiceCallbacks(Service):
                         
                     if link['tengig'] == "true":
                         template.apply('pbb-evpn-lag-loop-elan-tengig', vars)
-
             else:
-                template.apply('pbb-evpn-interface-elan', vars)
+                if link['gig'] == "true":
+                    template.apply('pbb-evpn-interface-gig', vars)
+                if link['tengig'] == "true":
+                    template.apply('pbb-evpn-interface-tengig', vars)
+
 
             for rtx in link['RT_EXPORT']:
                 vars.add('RT_EXPORT', rtx)
@@ -285,7 +289,6 @@ class ServiceCallbacks(Service):
 
             if link.ce_type == "hub":
                 link_data['hub'] = "true"
-                #link_data['HUB-ROUTE-TARGET'] = link.hub_route_target
             if link.ce_type == "spoke":
                 link_data['spoke'] = "true"
                 link_data['SPOKE-ROUTE-TARGET'] = link.spoke_route_target
@@ -339,9 +342,11 @@ class ServiceCallbacks(Service):
                         
                     if link['tengig'] == "true":
                         template.apply('pbb-evpn-lag-loop-etree-tengig', vars)
-
             else:
-                template.apply('pbb-evpn-interface-etree', vars)
+                if link['gig'] == "true":
+                    template.apply('pbb-evpn-interface-gig', vars)
+                if link['tengig'] == "true":
+                    template.apply('pbb-evpn-interface-tengig', vars)
 
             if link['hub'] == "true":
                 #vars.add('RT_EXPORT', link['HUB-ROUTE-TARGET'])

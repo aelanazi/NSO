@@ -142,7 +142,9 @@ module pbb-evpn {
           type leafref {
             path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 or " + 
+            "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 or " +
+            "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 " {
             error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -152,7 +154,9 @@ module pbb-evpn {
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or " + 
+            "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or " + 
+            "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 " {
             error-message "Interface is already used by another service, please make sure to pick free port.";
             }
             }
@@ -183,7 +187,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0
+                or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -201,7 +207,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or 
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -285,7 +293,9 @@ module pbb-evpn {
           type leafref {
             path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
-            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 
+            or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 or 
+            count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
             error-message "Interface is already used by another service, please make sure to pick free port.";
             }
             }
@@ -295,7 +305,9 @@ module pbb-evpn {
             type leafref {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
             }
-            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or
+            count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or
+            count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
             error-message "Interface is already used by another service, please make sure to pick free port.";
             }
             }
@@ -326,7 +338,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -344,7 +358,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -449,7 +465,9 @@ module pbb-evpn {
               path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
             }
             mandatory true;
-            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
+            must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 
+            or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0 or 
+            count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0" {
             error-message "Interface is already used by another service, please make sure to pick free port.";
             }
             }
@@ -460,7 +478,9 @@ module pbb-evpn {
                 path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:TenGigE/cisco-ios-xr:id";
               }
               mandatory true;
-              must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
+              must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or
+              count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0 or
+              count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][pe-port/pe-tengig-port=current()]) = 0" {
               error-message "Interface is already used by another service, please make sure to pick free port.";
               }
             }
@@ -482,7 +502,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0 or 
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }
@@ -500,7 +522,9 @@ module pbb-evpn {
             }
             mandatory true;
             }
-                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
+                must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0 or
+                count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device= current()/../../pe-device][Bundle-Ether/pe-port-tengig=current()]) = 0" {
                 error-message "Interface is already used by another service, please make sure to pick free port.";
             }
           }

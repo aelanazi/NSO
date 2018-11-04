@@ -15,6 +15,12 @@
                            <export tags="merge" foreach="{/eline/route-target/rt-export}">
                              <name>{$RT_EXPORT}</name>
                            </export>
+                           <import tags="merge" foreach="{/elan/route-target/rt-import}">
+                             <name>{$RT_IMPORT}</name>
+                           </import>
+                           <export tags="merge" foreach="{/elan/route-target/rt-export}">
+                             <name>{$RT_EXPORT}</name>
+                           </export>
                          </route-target>
                        </bgp>
                      </evi>

@@ -52,6 +52,24 @@
                          </id>
                        </bundle>
                      </GigabitEthernet>
+                      <GigabitEthernet tags="merge" foreach="{/elan/link/Bundle-Ether/pe-port/pe-port}">
+                       <id>{$PE-PORT}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                           <mode>active</mode>
+                         </id>
+                       </bundle>
+                     </GigabitEthernet>
+                      <GigabitEthernet tags="merge" foreach="{/etree/link/Bundle-Ether/pe-port/pe-port}">
+                       <id>{$PE-PORT}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                           <mode>active</mode>
+                         </id>
+                       </bundle>
+                     </GigabitEthernet>
                    </interface>
                  </config>
                </device>

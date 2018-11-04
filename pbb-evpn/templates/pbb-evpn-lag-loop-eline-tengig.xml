@@ -51,6 +51,22 @@
                          </id>
                        </bundle>
                      </TenGigE>
+                     <TenGigE tags="merge" foreach="{/elan/link/Bundle-Ether/pe-port-tengig/pe-port}">
+                       <id>{$PE-PORT}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                         </id>
+                       </bundle>
+                     </TenGigE>
+                      <TenGigE tags="merge" foreach="{/etree/link/Bundle-Ether/pe-port-tengig/pe-port}">
+                       <id>{$PE-PORT}</id>
+                       <bundle>
+                         <id>
+                           <id-value>{$INT-TYPE}</id-value>
+                         </id>
+                       </bundle>
+                     </TenGigE>
                    </interface>
                  </config>
                </device>

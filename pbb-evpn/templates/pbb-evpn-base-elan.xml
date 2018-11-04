@@ -28,7 +28,7 @@
                              </limit>
                            </mac>
                            <interface>
-                             <name>{$PE-PORT-TYPE}{$PE-PORT-1}.{$SVLAN-ID}</name>
+                             <name>{$PE-PORT-TYPE}{$INT-TYPE}.{$SVLAN-ID}</name>
                            </interface>
                            <pbb>
                              <edge>

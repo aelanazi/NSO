@@ -126,15 +126,15 @@ class ServiceCallbacks(Service):
                 vars.add('INT-TYPE', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
 
-            template.apply('pbb-evpn-base-eline', vars)
+            template.apply('pbb-evpn-base', vars)
 
             if link['Bundle'] == "true":
                 for port in link['pe_port']:
                     vars.add('PE-PORT', port)
                     if link['gig'] == "true":
-                        template.apply('pbb-evpn-lag-loop-eline-gig', vars)
+                        template.apply('pbb-evpn-lag-loop-gig', vars)
                     else:
-                        template.apply('pbb-evpn-lag-loop-eline-tengig', vars)
+                        template.apply('pbb-evpn-lag-loop-tengig', vars)
             else:
                 if link['gig'] == "true":
                     template.apply('pbb-evpn-interface-gig', vars)
@@ -146,7 +146,7 @@ class ServiceCallbacks(Service):
                     vars.add('RT_EXPORT', rtx)
                     for rtm in link['RT_IMPORT']:
                         vars.add('RT_IMPORT', rtm)
-                        template.apply('pbb-evpn-rt-loop-eline', vars)
+                        template.apply('pbb-evpn-rt-loop', vars)
             else:
                 if link['hub'] == "true":
                     template.apply('pbb-evpn-rt-hub-loop-etree', vars)

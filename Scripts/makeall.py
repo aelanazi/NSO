@@ -9,3 +9,4 @@ for dir in dirs:
 		os.system("make clean")
 		os.system("make all")
 		os.chdir("../../")
+

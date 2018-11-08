@@ -47,7 +47,7 @@ import socket
 # It has been observed that sync.from does not work always in that case run the sync-from against the device-group from NCS_CLI.
 
 with open('devices-lab.csv') as csvfile:
-    reader = csv.DictReader(csvfile)
+    reader = csv.DictReader(csvfile , delimiter=';')
     country = []
     device_name = []
     ip_addr = []

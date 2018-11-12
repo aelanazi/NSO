@@ -42,42 +42,6 @@ import ncs
 import csv
 import socket
 
-# This is the main part of the scripts which gets executed, it will read from devices-lab.csv file three rows "Country", "Hostname" and "Mgmt IP" then add them to their own lists. 
-# Next it will prepare the data to be used in the add_device function and call that function. When done it will open transaction to NSO and fetch ssh keys and sync-from the devices.
-# It has been observed that sync.from does not work always in that case run the sync-from against the device-group from NCS_CLI.
-
-with open('devices-lab.csv') as csvfile:
-    reader = csv.DictReader(csvfile , delimiter=';')
-    country = []
-    device_name = []
-    ip_addr = []
-    
-    for row in reader:
-        country = row['Country']
-        device_name = row['Hostname']
-        ip_addr = row['Mgmt IP']
-        devicegroup = ("B2B-EDU-"+(country))
-        rule_name = ("t" + (country) + "_CENMS_" + (device_name))
-        rule_name_main = ("t" + (country) + "-CENMS_nacm")
-        rule_name_main_upper = ("t%s-CENMS_nacm") % (country.upper())
-        rule_list_name = ("B2B-CE_" + (country))
-        add_device(device_name, devicegroup, ip_addr, rule_list_name, rule_name, country, rule_name_main)
-
-        # fetch-host-keys and sync-from does not require a transaction            
-        # continue using the Maapi object
-        with ncs.maapi.Maapi() as m:
-            with ncs.maapi.Session(m, 'admin', 'system'):
-                root = ncs.maagic.get_root(m)
-                device = root.devices.device[device_name]
-                print("Fetching SSH keys...")            
-                output = device.ssh.fetch_host_keys()            
-                print("Result: %s" % output.result)
-                print("Syncing configuration...")
-                output = device.sync_from()            
-                print("Result: %s" % output.result)            
-                if not output.result:                
-                    print("Error: %s" % output.info)
-
 def add_device(device_name, devicegroup, ip_addr, rule_list_name, rule_name, country, rule_name_main):
     """
     This function takes a device hostname as an input and adds that device into NSO.
@@ -99,8 +63,8 @@ def add_device(device_name, devicegroup, ip_addr, rule_list_name, rule_name, cou
         root.devices.device[device_name].device_type.cli.protocol = "ssh"
         root.devices.device[device_name].authgroup = "ciena"
         root.devices.device[device_name].state.admin_state = "unlocked"
-        print ("Onboarding device %s into NSO...") % device_name
         t.apply()
+        print ("Onboarding device %s into NSO...") % device_name
     #with ncs.maapi.single_write_trans('admin', 'system') as t2:
     #    root = ncs.maagic.get_root(t2)
     #    root.devices.device_group[devicegroup].sync_from()
@@ -127,3 +91,42 @@ def add_device(device_name, devicegroup, ip_addr, rule_list_name, rule_name, cou
         root.nacm__nacm.rule_list[rule_list_name].rule.create([rule_name]).access_operations = "*"
         root.nacm__nacm.rule_list[rule_list_name].rule.create([rule_name]).action = "permit"
         t3.apply()
+
+
+# This is the main part of the scripts which gets executed, it will read from devices-lab.csv file three rows "Country", "Hostname" and "Mgmt IP" then add them to their own lists. 
+# Next it will prepare the data to be used in the add_device function and call that function. When done it will open transaction to NSO and fetch ssh keys and sync-from the devices.
+# It has been observed that sync.from does not work always in that case run the sync-from against the device-group from NCS_CLI.
+
+with open('devices-lab.csv') as csvfile:
+    reader = csv.DictReader(csvfile , delimiter=';')
+    country = []
+    device_name = []
+    ip_addr = []
+    
+    for row in reader:
+        country = row['Country']
+        device_name = row['Hostname']
+        ip_addr = row['MgmtIP']
+        devicegroup = ("B2B-EDU-"+(country))
+        rule_name = ("t" + (country) + "_CENMS_" + (device_name))
+        rule_name_main = ("t" + (country) + "-CENMS_nacm")
+        rule_name_main_upper = ("t%s-CENMS_nacm") % (country.upper())
+        rule_list_name = ("B2B-CE_" + (country))
+        print(country, device_name, ip_addr, devicegroup, rule_name)  
+        add_device(device_name, devicegroup, ip_addr, rule_list_name, rule_name, country, rule_name_main)
+
+        # fetch-host-keys and sync-from does not require a transaction            
+        # continue using the Maapi object
+
+        with ncs.maapi.Maapi() as m:
+            with ncs.maapi.Session(m, 'admin', 'system'):
+                root = ncs.maagic.get_root(m)
+                device = root.devices.device[device_name]
+                print("Fetching SSH keys...")            
+                output = device.ssh.fetch_host_keys()            
+                print("Result: %s" % output.result)
+                print("Syncing configuration...")
+                output = device.sync_from()            
+                print("Result: %s" % output.result)            
+                if not output.result:                
+                    print("Error: %s" % output.info)

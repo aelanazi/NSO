@@ -22,21 +22,30 @@ module aspan-day1 {
         }
       }
 
-      leaf country {
-        type enumeration{
-          enum NL;
-          enum DE;
-          enum SK;
-          enum PL;
-          enum IE;
-          enum CH;
-          enum RO;
-          enum HU;
-          enum CZ;
-          enum CORP;
-        }
-      }
+    leaf cabinet {
+      type string;
+      mandatory true;
+    }
 
+    leaf location {
+      type string;
+      mandatory true;
+    }
+
+    leaf country {
+      type enumeration{
+        enum NL;
+        enum DE;
+        enum SK;
+        enum PL;
+        enum IE;
+        enum CH;
+        enum RO;
+        enum HU;
+        enum CZ;
+        enum CORP;
+       }
+    }
 
 
 

@@ -348,7 +348,7 @@
                      </access-list>
                    </access-list>
                    <banner xmlns="urn:ios">
-                     <exec>*********************************************************************************\r\n*************************************************\r\n                *                   LG CNO                     * \r\n                *        Unauthorized access prohibited         *\r\n                *************************************************\r\n                *                                               *\r\n                *                 {/hostname}                *\r\n                *                 Cisco ASR1002-X               *\r\n                *                 cabinet                 *\r\n                *                 site                    *\r\n</exec>
+                     <exec>*********************************************************************************\r\n*************************************************\r\n                *                   LG CNO                     * \r\n                *        Unauthorized access prohibited         *\r\n                *************************************************\r\n                *                                               *\r\n                *                 {/hostname}                *\r\n                *                 Cisco ASR1002-X               *\r\n                *                 {/cabinet}                 *\r\n                *                 site                    *\r\n</exec>
                      <login>********************************************************************************* \r\n Unauthorized access is prohibited \r\n \r\n \r\n This system is to be used only by specifically authorized personnel. \r\n Any unauthorized use of the system is unlawful, and may be subject \r\n to civil and/or criminal penalties.\r\n Any use of the system may be logged or monitored without further \r\n notice and resulting logs may be used as evidence in court. \r\n *********************************************************************************</login>
                    </banner>
                    <line xmlns="urn:ios">
@@ -676,7 +676,7 @@
                          <community-string>Mt1@cCc</community-string>
                        </host>
                      </host-vrf>
-                     <location>{/country}</location>
+                     <location>{/country} {/location}</location>
                      <trap-source>
                        <Loopback>4</Loopback>
                      </trap-source>

@@ -1,0 +1,5 @@
+RUN Test with TAG CHROME
+pybot.bat --include=CHROME --outputdir C:\Python27\NSO-Testing\Results  C:\Python27\NSO-Testing\Tests\Itential-Browser-Test.robot
+
+RUN Test with TAG IE
+pybot.bat --outputdir C:\Python27\NSO-Testing\Results  C:\Python27\NSO-Testing\Tests\Itential-Browser-Test.robot

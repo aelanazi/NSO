@@ -1,0 +1,6 @@
+  <aspan-day1 xmlns="http://com/example/aspanday1">
+    <hostname>devCISCO-1</hostname>
+    <cabinet>Test1</cabinet>
+    <location>NONO</location>
+    <country>NL</country>
+  </aspan-day1>

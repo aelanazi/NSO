@@ -48,9 +48,10 @@ class ServiceCallbacks(Service):
         idx = str(1)
         for link in endpoints.link:
             link_data = {'pe_device': link.pe_device}
-            link_data['Bundle'] = "false"
+            link_data['bundle'] = "false"
             link_data['gig'] = "false"
             link_data['tengig'] = "false"
+            link_data['dual-pe'] = "false"
             link_data['edge_i_sid'] = link.edge_i_sid
             link_data ['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
@@ -64,10 +65,11 @@ class ServiceCallbacks(Service):
                 link_data['pe_port_type'] = "TenGigabitEthernet"
 
             if link.nni_redundancy == "Dual-PE":
+                link_data ['dual-pe'] = "true"
                 link_data ['esi'] = link.Dual_PE.esi
             
             if link.nni_redundancy == "Protected":
-                link_data['Bundle'] = "true"
+                link_data['bundle'] = "true"
                 protect_name = "protect"
                 protect = (protect_name+idx)
                 protect = []
@@ -125,10 +127,9 @@ class ServiceCallbacks(Service):
             else:
                 vars.add('INT-TYPE', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
-
             template.apply('pbb-evpn-base', vars)
 
-            if link['Bundle'] == "true":
+            if link['bundle'] == "true":
                 for port in link['pe_port']:
                     vars.add('PE-PORT', port)
                     if link['gig'] == "true":
@@ -140,7 +141,11 @@ class ServiceCallbacks(Service):
                     template.apply('pbb-evpn-interface-gig', vars)
                 else:
                     template.apply('pbb-evpn-interface-tengig', vars)
-            
+                    
+            if link['dual-pe'] == "true":
+                vars.add('ESI', link['esi'])
+                template.apply('pbb-evpn-dualpe', vars)
+
             if service.service_type != "etree":
                 for rtx in link['RT_EXPORT']:
                     vars.add('RT_EXPORT', rtx)

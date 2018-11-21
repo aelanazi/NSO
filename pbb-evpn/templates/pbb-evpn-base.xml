@@ -2,8 +2,8 @@
   <devices xmlns="http://tail-f.com/ns/ncs">
   <device>
       <name>{$PE-DEVICE}</name>
-                 <config>
-                   <l2vpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
+        <config>
+          <l2vpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
                      <bridge>
                        <group>
                          <group-name>PBB_EVPN_CORE</group-name>

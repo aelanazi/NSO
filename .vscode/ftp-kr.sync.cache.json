@@ -4,6 +4,107 @@
       "local": {
         "nsoadmin": {
           "NSO_RUN_DIR": {
+            "pbb-evpn": {
+              "templates": {
+                "pbb-evpn-rt-loop.xml": {
+                  "type": "-",
+                  "size": 1368,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "pbb-evpn-lag-loop-gig.xml": {
+                  "type": "-",
+                  "size": 3376,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "pbb-evpn-rt-hub-loop-etree.xml": {
+                  "type": "-",
+                  "size": 989,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "pbb-evpn-base.xml": {
+                  "type": "-",
+                  "size": 1479,
+                  "lmtime": 1543062172295,
+                  "modified": false
+                },
+                "pbb-evpn-interface-gig.xml": {
+                  "type": "-",
+                  "size": 2638,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "pbb-evpn-dualpe.xml": {
+                  "type": "-",
+                  "size": 734,
+                  "lmtime": 1543062205902,
+                  "modified": false
+                },
+                "pbb-evpn-lag-loop-tengig.xml": {
+                  "type": "-",
+                  "size": 3191,
+                  "lmtime": 1542808644528,
+                  "modified": false
+                },
+                "pbb-evpn-interface-tengig.xml": {
+                  "type": "-",
+                  "size": 2441,
+                  "lmtime": 0,
+                  "modified": false
+                },
+                "pbb-evpn-rt-spoke-loop-etree.xml": {
+                  "type": "-",
+                  "size": 969,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              },
+              "python": {
+                "pbb_evpn": {
+                  "main.py.4fe674df252af98b89bfa030837d8ddf.py": {
+                    "type": "-",
+                    "size": 9290,
+                    "lmtime": 1543058678941,
+                    "modified": false
+                  },
+                  "main.py": {
+                    "type": "-",
+                    "size": 9082,
+                    "lmtime": 1543062505260,
+                    "modified": false
+                  },
+                  "devicehelper.py": {
+                    "type": "-",
+                    "size": 500,
+                    "lmtime": 0,
+                    "modified": false
+                  },
+                  "__init__.py": {
+                    "type": "-",
+                    "size": 0,
+                    "lmtime": 0,
+                    "modified": false
+                  }
+                }
+              },
+              "package-meta-data.xml": {
+                "type": "-",
+                "size": 384,
+                "lmtime": 0,
+                "modified": false
+              },
+              "load-dir": {},
+              "README": {
+                "type": "-",
+                "size": 747,
+                "lmtime": 0,
+                "modified": false
+              },
+              "src": {},
+              "test": {}
+            },
             "import-devices-into-nso-using-csv.py": {
               "type": "-",
               "size": 7131,
@@ -42,102 +143,7 @@
               "lmtime": 0,
               "modified": false
             },
-            "streams": {},
-            "pbb-evpn": {
-              "templates": {
-                "pbb-evpn-rt-loop.xml": {
-                  "type": "-",
-                  "size": 1368,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "pbb-evpn-lag-loop-gig.xml": {
-                  "type": "-",
-                  "size": 3376,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "pbb-evpn-rt-hub-loop-etree.xml": {
-                  "type": "-",
-                  "size": 989,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "pbb-evpn-base.xml": {
-                  "type": "-",
-                  "size": 1905,
-                  "lmtime": 1542810445988,
-                  "modified": false
-                },
-                "pbb-evpn-interface-gig.xml": {
-                  "type": "-",
-                  "size": 2638,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "pbb-evpn-dualpe.xml": {
-                  "type": "-",
-                  "size": 784,
-                  "lmtime": 1542810425082,
-                  "modified": false
-                },
-                "pbb-evpn-lag-loop-tengig.xml": {
-                  "type": "-",
-                  "size": 3191,
-                  "lmtime": 1542808644528,
-                  "modified": false
-                },
-                "pbb-evpn-interface-tengig.xml": {
-                  "type": "-",
-                  "size": 2441,
-                  "lmtime": 0,
-                  "modified": false
-                },
-                "pbb-evpn-rt-spoke-loop-etree.xml": {
-                  "type": "-",
-                  "size": 969,
-                  "lmtime": 0,
-                  "modified": false
-                }
-              },
-              "python": {
-                "pbb_evpn": {
-                  "main.py": {
-                    "type": "-",
-                    "size": 9077,
-                    "lmtime": 1542810568487,
-                    "modified": false
-                  },
-                  "devicehelper.py": {
-                    "type": "-",
-                    "size": 500,
-                    "lmtime": 0,
-                    "modified": false
-                  },
-                  "__init__.py": {
-                    "type": "-",
-                    "size": 0,
-                    "lmtime": 0,
-                    "modified": false
-                  }
-                }
-              },
-              "package-meta-data.xml": {
-                "type": "-",
-                "size": 384,
-                "lmtime": 0,
-                "modified": false
-              },
-              "load-dir": {},
-              "README": {
-                "type": "-",
-                "size": 747,
-                "lmtime": 0,
-                "modified": false
-              },
-              "src": {},
-              "test": {}
-            }
+            "streams": {}
           }
         }
       }

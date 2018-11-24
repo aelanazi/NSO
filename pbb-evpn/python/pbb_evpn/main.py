@@ -2,8 +2,8 @@
 import ncs
 import devicehelper
 from ncs.application import Service
-#import ncs.maapi as maapi
-#import ncs.maagic as maagic
+# import ncs.maapi as maapi
+# import ncs.maagic as maagic
 
 # ------------------------
 # SERVICE CALLBACK EXAMPLE
@@ -147,6 +147,7 @@ class ServiceCallbacks(Service):
                     template.apply('pbb-evpn-interface-tengig', vars)
 
             if link['dual-pe'] == "true":
+                vars.add('DUAL-PE', link.get('dual-pe'))
                 vars.add('ESI', link['esi'])
                 template.apply('pbb-evpn-dualpe', vars)
 

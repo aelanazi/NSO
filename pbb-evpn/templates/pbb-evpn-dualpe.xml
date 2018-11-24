@@ -3,6 +3,7 @@
     <device>
       <name>{$PE-DEVICE}</name>
       <config>
+        <?if {$DUAL-PE='true'}?>
         <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
           <interface tags="merge">
             <name>{$PE-PORT-TYPE}{$INT-TYPE}.{$SVLAN-ID}</name>
@@ -16,6 +17,7 @@
             </ethernet-segment>
           </interface>
         </evpn>
+        <?end?>
       </config>
     </device>
   </devices>

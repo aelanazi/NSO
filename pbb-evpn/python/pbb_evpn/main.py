@@ -8,19 +8,21 @@ from ncs.application import Service
 # ------------------------
 # SERVICE CALLBACK EXAMPLE
 # ------------------------
+
+
 class ServiceCallbacks(Service):
 
     # The create() callback is invoked inside NCS FASTMAP and
     # must always exist.
     @Service.create
     def cb_create(self, tctx, root, service, proplist):
-        
+
         self.log.info('Service create(service=', service._path, ')')
         serv_type = service.service_type
         serv_eline = "eline"
         serv_elan = "elan"
         serv_etree = "etree"
-        
+
         if serv_type == serv_eline:
             self.log.info("Provisioning Service type: ", serv_type)
             endpoints = service.eline
@@ -53,7 +55,7 @@ class ServiceCallbacks(Service):
             link_data['tengig'] = "false"
             link_data['dual-pe'] = "false"
             link_data['edge_i_sid'] = link.edge_i_sid
-            link_data ['svlan_id'] = link.svlan_id
+            link_data['svlan_id'] = link.svlan_id
             if link.interface_type == "GigabitEthernet":
                 link_data['gig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
@@ -65,9 +67,9 @@ class ServiceCallbacks(Service):
                 link_data['pe_port_type'] = "TenGigabitEthernet"
 
             if link.nni_redundancy == "Dual-PE":
-                link_data ['dual-pe'] = "true"
-                link_data ['esi'] = link.Dual_PE.esi
-            
+                link_data['dual-pe'] = "true"
+                link_data['esi'] = link.Dual_PE.esi
+
             if link.nni_redundancy == "Protected":
                 link_data['bundle'] = "true"
                 protect_name = "protect"
@@ -97,20 +99,21 @@ class ServiceCallbacks(Service):
                 rtx = []
                 for RT_EXPORT in endpoints.route_target.rt_export:
                     rtx.append(RT_EXPORT.asn_ip)
-                link_data ['RT_EXPORT'] = rtx
+                link_data['RT_EXPORT'] = rtx
 
                 rtm_name = "rtm"
                 rtm = (rtm_name+idx)
                 rtm = []
                 for RT_IMPORT in endpoints.route_target.rt_import:
                     rtm.append(RT_IMPORT.asn_ip)
-                link_data ['RT_IMPORT'] = rtm
+                link_data['RT_IMPORT'] = rtm
 
             idx += str(1)
-            
-            self.log.info('Normalizing data for device {} for Customer {} using the following data {}'.format(link_data['pe_device'], customer_name, link_data))
+
+            self.log.info('Normalizing data for device {} for Customer {} using the following data {}'.format(
+                link_data['pe_device'], customer_name, link_data))
             links_data.append(link_data)
-            
+
         for index, link in enumerate(links_data):
             self.log.info('Configuring device {}'.format(link['pe_device']))
             vars = ncs.template.Variables()
@@ -122,8 +125,9 @@ class ServiceCallbacks(Service):
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             vars.add('SVLAN-ID', link['svlan_id'])
             if link['pe_port_type'] == "Bundle-Ether":
-                vars.add('INT-TYPE', devicehelper.get_bundle_id(root, service, **link))
-                vars.add('PE-PORT-TYPE', link['pe_port_type'])                
+                vars.add(
+                    'INT-TYPE', devicehelper.get_bundle_id(root, service, **link))
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
             else:
                 vars.add('INT-TYPE', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
@@ -141,7 +145,7 @@ class ServiceCallbacks(Service):
                     template.apply('pbb-evpn-interface-gig', vars)
                 else:
                     template.apply('pbb-evpn-interface-tengig', vars)
-                    
+
             if link['dual-pe'] == "true":
                 vars.add('ESI', link['esi'])
                 template.apply('pbb-evpn-dualpe', vars)
@@ -158,7 +162,6 @@ class ServiceCallbacks(Service):
                 else:
                     vars.add('RT_EXPORT', link['SPOKE-ROUTE-TARGET'])
                     template.apply('pbb-evpn-rt-spoke-loop-etree', vars)
-
 
     # The pre_modification() and post_modification() callbacks are optional,
     # and are invoked outside FASTMAP. pre_modification() is invoked before

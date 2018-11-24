@@ -1,25 +1,25 @@
 <config-template xmlns="http://tail-f.com/ns/config/1.0">
   <devices xmlns="http://tail-f.com/ns/ncs">
-  <device>
+    <device>
       <name>{$PE-DEVICE}</name>
-                 <config>
-                   <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
-                     <evi>
-                       <id>{$EVI}</id>
-                       <bgp>
-                         <rd>65004:{$EVI}</rd>
-                          <route-target>
-                           <import tags="merge" foreach="{/etree/link/spoke-route-target}">
-                             <name>{/etree/link/spoke-route-target}</name>
-                           </import>
-                           <export>
-                             <name>{/etree/link/hub-route-target}</name>
-                           </export>
-                         </route-target>
-                       </bgp>
-                     </evi>
-                   </evpn>
-                 </config>
-               </device>
-        </devices>
+      <config>
+        <evpn xmlns="http://tail-f.com/ned/cisco-ios-xr">
+          <evi>
+            <id>{$EVI}</id>
+            <bgp>
+              <rd>65004:{$EVI}</rd>
+              <route-target>
+                <import tags="merge" foreach="{/etree/link/spoke-route-target}">
+                  <name>{/etree/link/spoke-route-target}</name>
+                </import>
+                <export>
+                  <name>{/etree/link/hub-route-target}</name>
+                </export>
+              </route-target>
+            </bgp>
+          </evi>
+        </evpn>
+      </config>
+    </device>
+  </devices>
 </config-template>

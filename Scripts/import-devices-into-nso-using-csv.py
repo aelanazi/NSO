@@ -1,4 +1,5 @@
-""" This module handles with device ned type already implemneted in l2vpn device helper. this was used for testing not relevant for onboarding script.
+""" This module handles with device ned type already implemented in l2vpn device helper.
+    this was used for testing not relevant for onboarding script.
 import ncs
 #with ncs.maapi.single_write_trans('admin', 'system') as t:    
 #    t.set_elem2('Duli was here', '/ncs:devices/device{ce0}/description')    

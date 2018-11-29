@@ -102,7 +102,29 @@
                 "lmtime": 0,
                 "modified": false
               },
-              "src": {},
+              "src": {
+                "java": {},
+                "yang": {
+                  "pbb-evpn.yang": {
+                    "type": "-",
+                    "size": 23195,
+                    "lmtime": 1543413004839,
+                    "modified": false
+                  },
+                  "pbb-evpn-bak.yang": {
+                    "type": "-",
+                    "size": 23520,
+                    "lmtime": 1543397672000,
+                    "modified": false
+                  }
+                },
+                "Makefile": {
+                  "type": "-",
+                  "size": 968,
+                  "lmtime": 0,
+                  "modified": false
+                }
+              },
               "test": {}
             },
             "import-devices-into-nso-using-csv.py": {
@@ -143,7 +165,13 @@
               "lmtime": 0,
               "modified": false
             },
-            "streams": {}
+            "streams": {},
+            "CE-CPE_Software_Upgrade.json": {
+              "type": "-",
+              "size": 47027,
+              "lmtime": 1543486376872,
+              "modified": false
+            }
           }
         }
       }

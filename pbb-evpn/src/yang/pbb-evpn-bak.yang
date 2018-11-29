@@ -62,7 +62,9 @@ module pbb-evpn {
       type uint16 {
         range "49000..49999";
         }
-        must "count(current() = ../../pbb-evpn[evi= current()/../../evi = current()) = 0"
+        must "count(../../pbb-evpn[customer-name != current()/../customer-name]/eline/link[pe-device= current()/../eline/link/pe-device][../../evi=current()]) = 0 or 
+        count(../../pbb-evpn[customer-name != current()/../customer-name]/elan/link[pe-device= current()/../elan/link/pe-device][../../evi=current()]) = 0 or
+        count(../../pbb-evpn[customer-name != current()/../customer-name]/etree/link[pe-device= current()/../etree/link/pe-device][../../evi=current()]) = 0"
          {
         error-message "EVI is already used by another service, please make sure to pick free EVI ID.";
         }
@@ -89,12 +91,6 @@ module pbb-evpn {
                 }
             }
       }
-    uses main-grouping;
-    }
-  
-
-
-grouping main-grouping {
 
       list link {
         tailf:info "PE-CE Attachment Point";
@@ -235,18 +231,9 @@ grouping main-grouping {
               }
           }
 
-    }  
-}
-
-
-
-
-
-
-
-
-
-
+    }
+  }
+ 
   container elan {
     tailf:cli-add-mode;
     when "(../service-type = 'elan')";

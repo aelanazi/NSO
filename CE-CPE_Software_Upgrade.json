@@ -1,0 +1,1409 @@
+{ 
+    "_id" : "39e768bc-6281-46a4-8ecb-84fc62353cb6", 
+    "name" : "CE-CPE_Software_Upgrade", 
+    "tasks" : {
+        "73" : {
+            "name" : "query", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "pass_on_null" : false, 
+                    "query" : "backup_status", 
+                    "obj" : "$var.d257.job_details"
+                }, 
+                "outgoing" : {
+                    "return_data" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Get backup status", 
+            "description" : "Get backup status", 
+            "groups" : [
+
+            ], 
+            "x" : 0.3575, 
+            "y" : 0.028708133971291867, 
+            "scheduled" : false
+        }, 
+        "1099" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "commands_results[0].rules[2].result", 
+                                    "operand_1" : {
+                                        "variable" : "mop_template_results", 
+                                        "task" : "8728"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : false, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Validate Upgrade Status", 
+            "description" : "Validate Upgrade Status", 
+            "groups" : [
+
+            ], 
+            "x" : 0.224375, 
+            "y" : -0.06060606060606061
+        }, 
+        "2028" : {
+            "name" : "decisionTask", 
+            "app" : "MOP", 
+            "type" : "manual", 
+            "variables" : {
+                "incoming" : {
+                    "title" : "Software Update Command Error", 
+                    "body" : "The software update command has error-ed repeatedly.  Click Continue to try to run it automatically again.  Otherwise, correct manually and click Continue to proceed with the workflow.", 
+                    "variables" : "variables", 
+                    "btn_success" : "Re-run Upgrade Command", 
+                    "btn_failure" : "Continue"
+                }, 
+                "outgoing" : {
+
+                }, 
+                "error" : ""
+            }, 
+            "view" : "/mop/task/decisionTask", 
+            "groups" : [
+                ObjectId("5b698168bf216d36cb0da8ed")
+            ], 
+            "x" : 0.901785714285714, 
+            "y" : -0.464285714285714, 
+            "description" : "Issue running the upgrade command", 
+            "summary" : "Upgrade Task Error", 
+            "scheduled" : false
+        }, 
+        "4401" : {
+            "name" : "evaluation", 
+            "summary" : "Run Evaluation", 
+            "description" : "Run an evaluation", 
+            "app" : "WorkFlowEngine", 
+            "displayName" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "configBackup", 
+                                    "operand_1" : {
+                                        "variable" : "variables", 
+                                        "task" : "job"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : true, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "deprecated" : false, 
+            "groups" : [
+
+            ], 
+            "x" : 0.29, 
+            "y" : 0.12121212121212122
+        }, 
+        "4898" : {
+            "name" : "concatString", 
+            "app" : "cenms", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "string1" : "success", 
+                    "string2" : "", 
+                    "string3" : "", 
+                    "variables" : ""
+                }, 
+                "outgoing" : {
+                    "resultString" : "$var.job.upgrade_status"
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Create status variable", 
+            "description" : "Create status variable", 
+            "groups" : [
+
+            ], 
+            "x" : 0.245833333333333, 
+            "y" : -0.492044063647491, 
+            "scheduled" : false, 
+            "actor" : "Pronghorn"
+        }, 
+        "5544" : {
+            "name" : "push", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "job_variable" : "devices", 
+                    "item_to_push" : "$var.job.device"
+                }, 
+                "outgoing" : {
+                    "job_variable_value" : null
+                }
+            }, 
+            "summary" : "Push Item to Array", 
+            "description" : "Push item to a job variable array", 
+            "groups" : [
+
+            ], 
+            "x" : 0.036036036036036, 
+            "y" : -0.0845070422535211
+        }, 
+        "7876" : {
+            "name" : "decisionTask", 
+            "app" : "MOP", 
+            "type" : "manual", 
+            "variables" : {
+                "incoming" : {
+                    "title" : "Upgrade Error Handling", 
+                    "body" : "Errors encountered during the upgrade process.", 
+                    "variables" : "", 
+                    "btn_success" : "Rerun from Software Protect", 
+                    "btn_failure" : "End Workflow"
+                }, 
+                "outgoing" : {
+
+                }, 
+                "error" : ""
+            }, 
+            "view" : "/mop/task/decisionTask", 
+            "groups" : [
+                ObjectId("5b698168bf216d36cb0da8ed")
+            ], 
+            "x" : 0.742857142857143, 
+            "y" : 0.15266106442577, 
+            "description" : "There is an issue with device configurations.", 
+            "summary" : "Error Handling During Upgrade", 
+            "scheduled" : false
+        }, 
+        "8728" : {
+            "name" : "RunCommandTemplate", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "template" : "CE-CPE-Upgrade-check_version", 
+                    "variables" : "$var.b239.return_data", 
+                    "devices" : "$var.job.devices"
+                }, 
+                "outgoing" : {
+                    "mop_template_results" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Check Current Status", 
+            "description" : "check Current status", 
+            "groups" : [
+
+            ], 
+            "x" : 0.148809523809524, 
+            "y" : -0.0869033047735618, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "workflow_start" : {
+            "name" : "workflow_start", 
+            "groups" : [
+
+            ], 
+            "x" : -0.253125, 
+            "y" : -0.07131537242472266
+        }, 
+        "workflow_end" : {
+            "name" : "workflow_end", 
+            "groups" : [
+
+            ], 
+            "x" : 1.37916666666667, 
+            "y" : -0.117647058823529
+        }, 
+        "cc89" : {
+            "name" : "RunCommand", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "command" : "software upgrade default-sftp-server package <!PKGFile!> package-path /sftproot/B2B-CE/ciena/software/<!PKGFile!> service-disruption allow", 
+                    "variables" : "$var.b239.return_data", 
+                    "device" : "$var.job.device"
+                }, 
+                "outgoing" : {
+                    "result" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Upgrade Software", 
+            "description" : "Run a command against a device.", 
+            "groups" : [
+
+            ], 
+            "x" : 0.751190476190476, 
+            "y" : -0.0904761904761905, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "4b05" : {
+            "name" : "RunCommand", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "command" : "software protect", 
+                    "variables" : "", 
+                    "device" : "$var.job.device"
+                }, 
+                "outgoing" : {
+                    "result" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Software Protect", 
+            "description" : "Run a command against a device.", 
+            "groups" : [
+
+            ], 
+            "x" : 0.441666666666667, 
+            "y" : -0.0964285714285714, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "b71d" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "result", 
+                                    "operand_1" : {
+                                        "variable" : "result", 
+                                        "task" : "4b05"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : true, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Check Command Results", 
+            "description" : "Determine if error response to command", 
+            "groups" : [
+
+            ], 
+            "x" : 0.513690476190476, 
+            "y" : -0.094047619047619
+        }, 
+        "af87" : {
+            "name" : "RunCommandTemplate", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "template" : "CE-CPE-Upgrade-check_version", 
+                    "variables" : "$var.b239.return_data", 
+                    "devices" : "$var.job.devices"
+                }, 
+                "outgoing" : {
+                    "mop_template_results" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Validate New Version", 
+            "description" : "Run a Command Template against devices.", 
+            "groups" : [
+
+            ], 
+            "x" : 0.974375, 
+            "y" : -0.08931419457735247, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "709d" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "commands_results[0].rules[1].result", 
+                                    "operand_1" : {
+                                        "variable" : "mop_template_results", 
+                                        "task" : "af87"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : false, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Validate Upgrade Status", 
+            "description" : "Validate Upgrade Status", 
+            "groups" : [
+
+            ], 
+            "x" : 1.07625, 
+            "y" : -0.07177033492822966
+        }, 
+        "b8b0" : {
+            "name" : "reattempt", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "job_id" : "$var.job._id", 
+                    "attemptID" : "upgrade", 
+                    "minutes" : NumberInt(2), 
+                    "attempts" : NumberInt(3)
+                }, 
+                "outgoing" : {
+                    "response" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Retry 3 times", 
+            "description" : "Re-attempt after n minutes", 
+            "groups" : [
+
+            ], 
+            "x" : 0.986309523809524, 
+            "y" : -0.3, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "ee3e" : {
+            "name" : "decisionTask", 
+            "app" : "MOP", 
+            "type" : "manual", 
+            "variables" : {
+                "incoming" : {
+                    "title" : "Re-Check Max Reached", 
+                    "body" : "The maximum number of retries has been reached.", 
+                    "variables" : "", 
+                    "btn_success" : "Check One More Time", 
+                    "btn_failure" : "End Workflow"
+                }, 
+                "outgoing" : {
+
+                }, 
+                "error" : ""
+            }, 
+            "view" : "/mop/task/decisionTask", 
+            "groups" : [
+                ObjectId("5b698168bf216d36cb0da8ed")
+            ], 
+            "x" : 1.17261904761905, 
+            "y" : 0.137254901960784, 
+            "description" : "There is an issue with device configurations.", 
+            "summary" : "Max Upgrade Retries Reached", 
+            "scheduled" : false
+        }, 
+        "4e8f" : {
+            "name" : "reattempt", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "job_id" : "$var.job._id", 
+                    "attemptID" : "upgradecmd", 
+                    "minutes" : NumberInt(5), 
+                    "attempts" : NumberInt(6)
+                }, 
+                "outgoing" : {
+                    "response" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Retry 6 times", 
+            "description" : "Re-attempt after n minutes", 
+            "groups" : [
+
+            ], 
+            "x" : 0.821875, 
+            "y" : -0.26465927099841524, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "c95b" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : true, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "response", 
+                                    "operand_1" : {
+                                        "variable" : "result", 
+                                        "task" : "cc89"
+                                    }, 
+                                    "operator" : "contains", 
+                                    "operand_2" : {
+                                        "variable" : "read timeout", 
+                                        "task" : "static"
+                                    }
+                                }, 
+                                {
+                                    "query" : "response", 
+                                    "operand_1" : {
+                                        "variable" : "result", 
+                                        "task" : "cc89"
+                                    }, 
+                                    "operator" : "contains", 
+                                    "operand_2" : {
+                                        "variable" : "ERROR", 
+                                        "task" : "static"
+                                    }
+                                }, 
+                                {
+                                    "query" : "response", 
+                                    "operand_1" : {
+                                        "variable" : "result", 
+                                        "task" : "cc89"
+                                    }, 
+                                    "operator" : "contains", 
+                                    "operand_2" : {
+                                        "variable" : "software protect", 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }, 
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "response", 
+                                    "operand_1" : {
+                                        "variable" : "result", 
+                                        "task" : "cc89"
+                                    }, 
+                                    "operator" : "!contains", 
+                                    "operand_2" : {
+                                        "variable" : "sequence not required", 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Check Command Results", 
+            "description" : "Determine if error response to command", 
+            "groups" : [
+
+            ], 
+            "x" : 0.8405253283302064, 
+            "y" : -0.10923535253227408
+        }, 
+        "d9c0" : {
+            "name" : "RunCommandTemplate", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "template" : "CE-CPE-Upgrade-check_version", 
+                    "variables" : "$var.b239.return_data", 
+                    "devices" : "$var.job.devices"
+                }, 
+                "outgoing" : {
+                    "mop_template_results" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Check Protect Status", 
+            "description" : "check protect status", 
+            "groups" : [
+
+            ], 
+            "x" : 0.595238095238095, 
+            "y" : -0.0988095238095238, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "3afc" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "commands_results[0].rules[0].result", 
+                                    "operand_1" : {
+                                        "variable" : "mop_template_results", 
+                                        "task" : "d9c0"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : false, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Validate Version", 
+            "description" : "Validate Version is upgraded", 
+            "groups" : [
+
+            ], 
+            "x" : 0.674404761904762, 
+            "y" : -0.102380952380952
+        }, 
+        "7e8f" : {
+            "name" : "reattempt", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "job_id" : "$var.job._id", 
+                    "attemptID" : "protect", 
+                    "minutes" : NumberInt(2), 
+                    "attempts" : NumberInt(6)
+                }, 
+                "outgoing" : {
+                    "response" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Retry 6 times", 
+            "description" : "Re-attempt 6 times 2 minutes appart", 
+            "groups" : [
+
+            ], 
+            "x" : 0.673809523809524, 
+            "y" : -0.292533659730722, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "e3b4" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "commands_results[0].rules[2].result", 
+                                    "operand_1" : {
+                                        "variable" : "mop_template_results", 
+                                        "task" : "af87"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : true, 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Validate Version", 
+            "description" : "Validate Version", 
+            "groups" : [
+
+            ], 
+            "x" : 1.14125, 
+            "y" : -0.08133971291866028
+        }, 
+        "af90" : {
+            "name" : "reattempt", 
+            "app" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "job_id" : "$var.job._id", 
+                    "attemptID" : "version", 
+                    "minutes" : NumberInt(2), 
+                    "attempts" : NumberInt(3)
+                }, 
+                "outgoing" : {
+                    "response" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Retry 3 times", 
+            "description" : "Re-attempt after n minutes", 
+            "groups" : [
+
+            ], 
+            "x" : 1.06904761904762, 
+            "y" : -0.3, 
+            "scheduled" : false, 
+            "actor" : "job"
+        }, 
+        "f73a" : {
+            "name" : "query", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "pass_on_null" : false, 
+                    "query" : "commands_results[0]", 
+                    "obj" : "$var.8728.mop_template_results"
+                }, 
+                "outgoing" : {
+                    "return_data" : "$var.job.delayInMinutes"
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Get Command Results", 
+            "description" : "Command Results", 
+            "groups" : [
+
+            ], 
+            "x" : 0.239880952380952, 
+            "y" : -0.157894736842105, 
+            "scheduled" : false
+        }, 
+        "2a77" : {
+            "name" : "concatString", 
+            "app" : "cenms", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "string1" : "error", 
+                    "string2" : "", 
+                    "string3" : "", 
+                    "variables" : ""
+                }, 
+                "outgoing" : {
+                    "resultString" : "$var.job.upgrade_status"
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Create status variable", 
+            "description" : "Create status variable", 
+            "groups" : [
+
+            ], 
+            "x" : 0.903571428571429, 
+            "y" : 0.352509179926561, 
+            "scheduled" : false, 
+            "actor" : "Pronghorn"
+        }, 
+        "653c" : {
+            "name" : "concatString", 
+            "app" : "cenms", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "string1" : "success", 
+                    "string2" : "", 
+                    "string3" : "", 
+                    "variables" : ""
+                }, 
+                "outgoing" : {
+                    "resultString" : "$var.job.upgrade_status"
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Create status variable", 
+            "description" : "Create status variable", 
+            "groups" : [
+
+            ], 
+            "x" : 1.22375, 
+            "y" : -0.10207336523125997, 
+            "scheduled" : false, 
+            "actor" : "Pronghorn"
+        }, 
+        "d257" : {
+            "name" : "childJob", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "task" : "", 
+                    "workflow" : "CPE-Daily-Config-Backup-Child", 
+                    "variables" : {
+                        "device" : {
+                            "variable" : "\"\"", 
+                            "task" : "job", 
+                            "value" : "device"
+                        }, 
+                        "variables" : {
+                            "variable" : "\"\"", 
+                            "task" : "a6e1", 
+                            "value" : "merged_object"
+                        }, 
+                        "_id" : {
+                            "variable" : "\"\"", 
+                            "task" : "job", 
+                            "value" : "_id"
+                        }, 
+                        "device_group" : {
+                            "variable" : "", 
+                            "task" : "static"
+                        }
+                    }
+                }, 
+                "outgoing" : {
+                    "job_details" : null
+                }
+            }, 
+            "summary" : "Run Backup workflow", 
+            "description" : "Run Backup workflow", 
+            "groups" : [
+
+            ], 
+            "x" : 0.321875, 
+            "y" : -0.11164274322169059, 
+            "actor" : "job"
+        }, 
+        "a6e1" : {
+            "name" : "merge", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "data_to_merge" : [
+                        {
+                            "key" : "device", 
+                            "value" : {
+                                "task" : "job", 
+                                "variable" : "device"
+                            }
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "merged_object" : null
+                }
+            }, 
+            "summary" : "Create variables for backup child job", 
+            "description" : "Create variables for backup child job", 
+            "groups" : [
+
+            ], 
+            "x" : 0.246875, 
+            "y" : 0.044657097288676235
+        }, 
+        "6ec8" : {
+            "name" : "updateUpgradeDetails", 
+            "app" : "cenms", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "device" : "$var.job.device", 
+                    "job_id" : "$var.job._id", 
+                    "upgrade_package" : "$var.edde.return_data", 
+                    "backup_status" : "$var.73.return_data", 
+                    "upgrade_status" : "$var.job.upgrade_status"
+                }, 
+                "outgoing" : {
+                    "result" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "update Upgrade details for a device in DB", 
+            "description" : "update OS Upgrade details for device in DB", 
+            "groups" : [
+
+            ], 
+            "x" : 1.33690476190476, 
+            "y" : 0.0611995104039168, 
+            "scheduled" : false, 
+            "actor" : "Pronghorn"
+        }, 
+        "edde" : {
+            "name" : "query", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "pass_on_null" : false, 
+                    "query" : "variables[PKGFile]", 
+                    "obj" : "$var.job.variables"
+                }, 
+                "outgoing" : {
+                    "return_data" : null
+                }, 
+                "error" : ""
+            }, 
+            "summary" : "Get package file", 
+            "description" : "Get package file", 
+            "groups" : [
+
+            ], 
+            "x" : -0.07375, 
+            "y" : -0.060221870047543584, 
+            "scheduled" : false
+        }, 
+        "158a" : {
+            "name" : "evaluation", 
+            "app" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "all_true_flag" : false, 
+                    "evaluation_groups" : [
+                        {
+                            "all_true_flag" : false, 
+                            "evaluations" : [
+                                {
+                                    "query" : "", 
+                                    "operand_1" : {
+                                        "variable" : "return_data", 
+                                        "task" : "73"
+                                    }, 
+                                    "operator" : "==", 
+                                    "operand_2" : {
+                                        "variable" : "success", 
+                                        "task" : "static"
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }, 
+                "outgoing" : {
+                    "return_value" : null
+                }
+            }, 
+            "summary" : "Check backup status", 
+            "description" : "Check backup status", 
+            "groups" : [
+
+            ], 
+            "x" : 0.407738095238095, 
+            "y" : 0.0630252100840336
+        }, 
+        "b239" : {
+            "name" : "query", 
+            "summary" : "QUERY VARIABLES", 
+            "description" : "QUERY VARIABLES", 
+            "app" : "WorkFlowEngine", 
+            "displayName" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "pass_on_null" : false, 
+                    "query" : "variables", 
+                    "obj" : "$var.job.variables"
+                }, 
+                "outgoing" : {
+                    "return_data" : null
+                }, 
+                "error" : ""
+            }, 
+            "deprecated" : false, 
+            "groups" : [
+
+            ], 
+            "x" : -0.034375, 
+            "y" : -0.06539074960127592, 
+            "scheduled" : false
+        }, 
+        "6bab" : {
+            "name" : "delay", 
+            "summary" : "Delay a Job", 
+            "description" : "Delay a Job for a duration by Job ID and number of seconds.", 
+            "app" : "WorkFlowEngine", 
+            "displayName" : "WorkFlowEngine", 
+            "type" : "operation", 
+            "variables" : {
+                "incoming" : {
+                    "time" : NumberInt(600)
+                }, 
+                "outgoing" : {
+                    "time_in_milliseconds" : null
+                }, 
+                "error" : ""
+            }, 
+            "deprecated" : false, 
+            "groups" : [
+
+            ], 
+            "x" : 1.010625, 
+            "y" : 0.1410459587955626, 
+            "scheduled" : false
+        }, 
+        "1c9f" : {
+            "name" : "confirmTask", 
+            "summary" : "Upgrade not needed", 
+            "description" : "Upgrade not needed", 
+            "app" : "MOP", 
+            "displayName" : "MOP", 
+            "type" : "manual", 
+            "variables" : {
+                "incoming" : {
+                    "title" : "Device already on level", 
+                    "body" : "The selected device is already at the os version selected.  Please select another version or quit the upgrade process.<BR><BR><PRE><!device!></PRE>", 
+                    "variables" : "$var.f73a.return_data"
+                }, 
+                "outgoing" : {
+
+                }, 
+                "error" : ""
+            }, 
+            "view" : "/mop/task/confirmTask", 
+            "deprecated" : false, 
+            "groups" : [
+                ObjectId("5b698168bf216d36cb0da8ed")
+            ], 
+            "x" : 0.1725, 
+            "y" : -0.3062200956937799, 
+            "scheduled" : false
+        }, 
+        "76e6" : {
+            "name" : "RunCommand", 
+            "summary" : "Config save", 
+            "description" : "Config save", 
+            "app" : "MOP", 
+            "displayName" : "MOP", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "command" : "config save", 
+                    "variables" : "", 
+                    "device" : "$var.job.device"
+                }, 
+                "outgoing" : {
+                    "result" : null
+                }, 
+                "error" : ""
+            }, 
+            "deprecated" : false, 
+            "groups" : [
+
+            ], 
+            "actor" : "job", 
+            "x" : 1.205, 
+            "y" : -0.3237639553429027, 
+            "scheduled" : false
+        }, 
+        "7dfd" : {
+            "name" : "upgradeJobGroupsCEMgmt", 
+            "summary" : "Updates job groups to initiators groups", 
+            "description" : "Updates job groups to initiators groups - cpe workflows", 
+            "app" : "cenms", 
+            "displayName" : "cenms", 
+            "type" : "automatic", 
+            "variables" : {
+                "incoming" : {
+                    "job_id" : "$var.job._id"
+                }, 
+                "outgoing" : {
+                    "groups" : null
+                }, 
+                "error" : ""
+            }, 
+            "deprecated" : false, 
+            "groups" : [
+
+            ], 
+            "actor" : "job", 
+            "x" : -0.160625, 
+            "y" : -0.06220095693779904, 
+            "scheduled" : false
+        }
+    }, 
+    "transitions" : {
+        "73" : {
+            "158a" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "1099" : {
+            "f73a" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "a6e1" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "2028" : {
+            "af87" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "cc89" : {
+                "type" : "revert", 
+                "state" : "success"
+            }
+        }, 
+        "4401" : {
+            "d257" : {
+                "type" : "standard", 
+                "state" : "success"
+            }, 
+            "4b05" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }
+        }, 
+        "4898" : {
+            "workflow_end" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "5544" : {
+            "8728" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "5603" : {
+
+        }, 
+        "7876" : {
+            "4b05" : {
+                "type" : "revert", 
+                "state" : "success"
+            }, 
+            "2a77" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }
+        }, 
+        "8728" : {
+            "1099" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "workflow_start" : {
+            "7dfd" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "workflow_end" : {
+
+        }, 
+        "efed" : {
+
+        }, 
+        "cc89" : {
+            "c95b" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "4b05" : {
+            "7876" : {
+                "type" : "standard", 
+                "state" : "error"
+            }, 
+            "b71d" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "b71d" : {
+            "7876" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "d9c0" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "af87" : {
+            "709d" : {
+                "type" : "standard", 
+                "state" : "success"
+            }, 
+            "6bab" : {
+                "type" : "standard", 
+                "state" : "error"
+            }
+        }, 
+        "709d" : {
+            "b8b0" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "e3b4" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "b8b0" : {
+            "af87" : {
+                "type" : "revert", 
+                "state" : "success"
+            }, 
+            "6bab" : {
+                "type" : "standard", 
+                "state" : "error"
+            }
+        }, 
+        "ee3e" : {
+            "2a77" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "6bab" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "4e8f" : {
+            "2028" : {
+                "type" : "standard", 
+                "state" : "error"
+            }, 
+            "cc89" : {
+                "type" : "revert", 
+                "state" : "success"
+            }
+        }, 
+        "c95b" : {
+            "4e8f" : {
+                "type" : "standard", 
+                "state" : "success"
+            }, 
+            "af87" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }
+        }, 
+        "d9c0" : {
+            "3afc" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "3afc" : {
+            "7e8f" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "cc89" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "7e8f" : {
+            "d9c0" : {
+                "type" : "revert", 
+                "state" : "success"
+            }, 
+            "cc89" : {
+                "type" : "standard", 
+                "state" : "error"
+            }
+        }, 
+        "e3b4" : {
+            "af90" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }, 
+            "76e6" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "af90" : {
+            "af87" : {
+                "type" : "revert", 
+                "state" : "success"
+            }, 
+            "ee3e" : {
+                "type" : "standard", 
+                "state" : "error"
+            }
+        }, 
+        "c183" : {
+
+        }, 
+        "f73a" : {
+            "1c9f" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "aee1" : {
+
+        }, 
+        "2a77" : {
+            "6ec8" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "653c" : {
+            "6ec8" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "2fa6" : {
+
+        }, 
+        "d257" : {
+            "73" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "a6e1" : {
+            "4401" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "6ec8" : {
+            "workflow_end" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "edde" : {
+            "b239" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "b170" : {
+
+        }, 
+        "158a" : {
+            "4b05" : {
+                "type" : "standard", 
+                "state" : "success"
+            }, 
+            "2a77" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }
+        }, 
+        "b239" : {
+            "5544" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "6bab" : {
+            "7876" : {
+                "type" : "standard", 
+                "state" : "error"
+            }, 
+            "af87" : {
+                "type" : "revert", 
+                "state" : "success"
+            }
+        }, 
+        "1c9f" : {
+            "4898" : {
+                "type" : "standard", 
+                "state" : "success"
+            }, 
+            "workflow_end" : {
+                "type" : "standard", 
+                "state" : "failure"
+            }
+        }, 
+        "76e6" : {
+            "653c" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }, 
+        "7dfd" : {
+            "edde" : {
+                "type" : "standard", 
+                "state" : "success"
+            }
+        }
+    }, 
+    "font_size" : NumberInt(12), 
+    "created" : ISODate("2018-03-06T14:51:14.000+0000"), 
+    "created_by" : ObjectId("5b1838223ca252dd6bd6333d"), 
+    "last_updated" : ISODate("2018-09-18T08:40:03.203+0000"), 
+    "last_updated_by" : ObjectId("5afb38944dd7cee1803d219f"), 
+    "groups" : [
+
+    ], 
+    "type" : "automation"
+}

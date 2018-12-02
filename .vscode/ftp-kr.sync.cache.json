@@ -103,45 +103,26 @@
                 "modified": false
               },
               "src": {
-                "java": {},
                 "yang": {
                   "pbb-evpn.yang": {
                     "type": "-",
-                    "size": 23195,
-                    "lmtime": 1543413004839,
+                    "size": 12234,
+                    "lmtime": 1543739829709,
                     "modified": false
                   },
-                  "pbb-evpn-bak.yang": {
+                  "pbb-evpn-before-refactoring.yang": {
                     "type": "-",
-                    "size": 23520,
-                    "lmtime": 1543397672000,
+                    "size": 12234,
+                    "lmtime": 1543739819064,
                     "modified": false
                   }
-                },
-                "Makefile": {
-                  "type": "-",
-                  "size": 968,
-                  "lmtime": 0,
-                  "modified": false
                 }
               },
               "test": {}
             },
-            "import-devices-into-nso-using-csv.py": {
-              "type": "-",
-              "size": 7131,
-              "lmtime": 0,
-              "modified": false
-            },
             "cdb": {},
             "target": {},
             "lab": {},
-            "devices-lab.csv": {
-              "type": "-",
-              "size": 6764,
-              "lmtime": 0,
-              "modified": false
-            },
             "state": {},
             "backups": {},
             "scripts": {},
@@ -152,12 +133,6 @@
               "lmtime": 0,
               "modified": false
             },
-            "R1.xml": {
-              "type": "-",
-              "size": 11979,
-              "lmtime": 0,
-              "modified": false
-            },
             "rollbacks": {},
             "INSTALLATION-LOG": {
               "type": "-",
@@ -165,13 +140,7 @@
               "lmtime": 0,
               "modified": false
             },
-            "streams": {},
-            "CE-CPE_Software_Upgrade.json": {
-              "type": "-",
-              "size": 47027,
-              "lmtime": 1543486376872,
-              "modified": false
-            }
+            "streams": {}
           }
         }
       }

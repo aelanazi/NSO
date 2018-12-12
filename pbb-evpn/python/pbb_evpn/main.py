@@ -1,6 +1,7 @@
 # -*- mode: python; python-indent: 4 -*-
 import ncs
 import devicehelper
+import validations
 from ncs.application import Service
 # import ncs.maapi as maapi
 # import ncs.maagic as maagic
@@ -123,6 +124,10 @@ class ServiceCallbacks(Service):
             vars.add('PE-DEVICE', link['pe_device'])
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
+            log_prefix = "PBB-EVPN::"
+            if validations.is_svlan_id_in_use(root, service, **link):
+                raise ValueError(log_prefix + "SVLAN-ID {} not unique on device {} using the giving port {}{}".format(link['svlan_id'], link['pe_device'], link['pe_port_type'], link['pe_port_1']))
+
             vars.add('SVLAN-ID', link['svlan_id'])
             if link['pe_port_type'] == "Bundle-Ether":
                 vars.add(

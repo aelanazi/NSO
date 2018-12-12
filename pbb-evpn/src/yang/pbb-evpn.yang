@@ -51,8 +51,8 @@ module pbb-evpn {
             }
 
             leaf evi {
-                description "EVPN Instance ID, Country DE allowed range 49,000 – 49,999,
-                                For IA Connected=49102, Static:49103";
+                description "EVPN Instance ID, Country DE allowed range 49,000 - 49,999, For
+                                IA Connected=49102, Static:49103";
                 mandatory true;
                 type uint16 {
                     range "49000..49999";
@@ -60,8 +60,7 @@ module pbb-evpn {
                 // Use the following command to build the XPATH: do show run services pbb-evpn 1990 | display prefixes | display xpath 
                 // XPATH is: /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='1990']/pbb-evpn:evi 49000
                 // EVI must be unique and not used by any other service.
-                must "not(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../vpn-id]/pbb-evpn:evi
-                                =current()/../evi)" {
+                must "not(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../vpn-id]/pbb-evpn:evi=current()/../evi)" {
                     error-message "EVI is already used by another service, please make sure to pick
                                         free EVI ID.";
                 }
@@ -118,6 +117,7 @@ module pbb-evpn {
                     tailf:info "PE-CE Attachment Point";
                     key link-id;
                     min-elements 2;
+
                     leaf link-id {
                         tailf:info "Link ID";
                         mandatory true;
@@ -136,6 +136,7 @@ module pbb-evpn {
                     tailf:info "PE-CE Attachment Point";
                     key link-id;
                     min-elements 2;
+
                     leaf link-id {
                         tailf:info "Link ID";
                         mandatory true;
@@ -181,11 +182,23 @@ module pbb-evpn {
                         range "4900000..4999999" {
                         }
                     }
+                    // XPATH example: 
                     // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='1990']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='site-a']/pbb-evpn:edge-i-sid 4900000
-                    must "not(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id
-                                        !=current()/../link-id]/pbb-evpn:edge-i-sid =current()/../edge-i-sid)
-                                        or (/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id
-                                        !=current()/../link-id]/pbb-evpn:edge-i-sid =current()/../edge-i-sid)" {
+                    // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='1990']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='site-b']/pbb-evpn:edge-i-sid 4900000
+                    // Prevent the reuse of the SID ID for any service (E-LINE, E-LAN, E-Tree) The follwoin must statment makes sure the SID is unique.
+
+                    must "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                                        =current()) = 0 " {
                         error-message "I-SID (Instance Service ID) is already used by another service,
                                                 please make sure to pick free I-SID ID.";
                     }
@@ -224,16 +237,45 @@ module pbb-evpn {
                         type leafref {
                             path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:GigabitEthernet/cisco-ios-xr:id";
                         }
-                        must "count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device=
-                                                current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                                                or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device=
-                                                current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                                                or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device=
-                                                current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                                                " {
-                            error-message "Interface is already used by another service, please make sure
-                                                        to pick free port.";
-                        }
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/
+
+                        // nsoadmin@ncs# show running-config services pbb-evpn 101 | display prefixes | display xpath 
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:service-type eline
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:evi 49002
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:customer-name Test1
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:route-target/pbb-evpn:rt-export[pbb-evpn:asn-ip='2:1']
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:route-target/pbb-evpn:rt-import[pbb-evpn:asn-ip='1:1']
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:edge-i-sid 4900001
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:pe-device deviosxr-lab-1
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:svlan-id 300
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:interface-type TenGigabitEthernet
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:pe-port/pbb-evpn:pe-tengig-port 0
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:nni-redundancy Protected
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:Bundle-Ether/pbb-evpn:pe-port-tengig[pbb-evpn:pe-port='1']
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='1']/pbb-evpn:Bundle-Ether/pbb-evpn:pe-port-tengig[pbb-evpn:pe-port='2']
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:edge-i-sid 4900002
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:pe-device deviosxr-lab-2
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:svlan-id 300
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:pe-port/pbb-evpn:pe-gig-port 0
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:nni-redundancy Protected
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:Bundle-Ether/pbb-evpn:pe-port[pbb-evpn:pe-port='1']
+                        // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='101']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='2']/pbb-evpn:Bundle-Ether/pbb-evpn:pe-port[pbb-evpn:pe-port='2']
+
+                        //must "not(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id
+                        //                        !=current()/../../link-id][pbb-evpn:pe-device =current()/../../pe-device]/pbb-evpn:pe-port[pbb-evpn:pe-gig-port
+                        //                        =current()]) and (/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id
+                        //                        !=current()/../../link-id][pbb-evpn:pe-device =current()/../../pe-device][pbb-evpn:svlan-id =current()/../../svlan-id])" {
+
+                            //	../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device=
+                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                            //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device=
+                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                            //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device=
+                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                            //                        " {
+                            //error-message "Interface is already used by another service, please make sure
+                           //                             to pick free port.";
+                        //}
                     }
                     leaf pe-tengig-port {
                         tailf:info "Customer Facing Interface";

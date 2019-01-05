@@ -5,12 +5,10 @@ import ncs.maagic as maagic
 def is_svlan_id_in_use(root, service, **link):
     """
     Check if a svlan-id is already in use on a device.
-
-    :param trans:       NSO transaction.
     :param log:         Service log.
     :param device:      Device name.
+    :link               Dictionary contains all service data per link.
     :param svlan_id:    SVLAN to check.
-    :param vc_id:       Service vc-id.
     :return: True if the svlan-id is in use, otherwise False.
     """
     m = maapi.Maapi()

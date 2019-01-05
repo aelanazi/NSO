@@ -122,12 +122,6 @@
               "modified": false
             },
             "rollbacks": {},
-            "INSTALLATION-LOG": {
-              "type": "-",
-              "size": 1723,
-              "lmtime": 0,
-              "modified": false
-            },
             "streams": {}
           }
         }

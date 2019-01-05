@@ -61,11 +61,15 @@ class ServiceCallbacks(Service):
                 link_data['gig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
                 link_data['pe_port_type'] = "GigabitEthernet"
-            else:
-                link.interface_type == "TenGigabitEthernet"
+            elif link.interface_type == "TenGigabitEthernet":
                 link_data['tengig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_tengig_port
                 link_data['pe_port_type'] = "TenGigabitEthernet"
+            else:
+                # link.interface_type == "Bundle-Ether":
+                link_data['Bundle-Ether'] = "true"
+                link_data['pe_port_1'] = link.pe_port.pe_bundle_port
+                link_data['pe_port_type'] = "Bundle-Ether"
 
             if link.nni_redundancy == "Dual-PE":
                 link_data['dual-pe'] = "true"
@@ -117,25 +121,28 @@ class ServiceCallbacks(Service):
 
         for index, link in enumerate(links_data):
             self.log.info('Configuring device {}'.format(link['pe_device']))
+
+            if validations.is_svlan_id_in_use(root, service, **link):
+                raise ValueError("SVLAN-ID {} not unique on device {} using the giving port {}{}".format(
+                    link['svlan_id'], link['pe_device'], link['pe_port_type'], link['pe_port_1']))
+
             vars = ncs.template.Variables()
             template = ncs.template.Template(service)
             vars.add('CUSTOMER-NAME', customer_name)
             vars.add('EVI', evi)
             vars.add('PE-DEVICE', link['pe_device'])
-            vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
-            log_prefix = "PBB-EVPN::"
-            if validations.is_svlan_id_in_use(root, service, **link):
-                raise ValueError(log_prefix + "SVLAN-ID {} not unique on device {} using the giving port {}{}".format(link['svlan_id'], link['pe_device'], link['pe_port_type'], link['pe_port_1']))
-
-            vars.add('SVLAN-ID', link['svlan_id'])
-            if link['pe_port_type'] == "Bundle-Ether":
-                vars.add(
-                    'INT-TYPE', devicehelper.get_bundle_id(root, service, **link))
+            if link['pe_port_type'] == "Bundle-Ether" and link['pe_port_1'] is None:
+                vars.add('INT-TYPE', devicehelper.get_bundle_id(root, service, **link))
+                vars.add('PE-PORT-TYPE', link['pe_port_type'])
+            elif link['pe_port_type'] != "Bundle-Ether" and link['pe_port_1'] is not None:
+                vars.add('PE-PORT-1', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
             else:
+                vars.add('PE-PORT-1', link['pe_port_1'])
                 vars.add('INT-TYPE', link['pe_port_1'])
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
+            vars.add('SVLAN-ID', link['svlan_id'])
             template.apply('pbb-evpn-base', vars)
 
             if link['bundle'] == "true":

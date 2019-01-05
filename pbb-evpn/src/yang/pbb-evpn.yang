@@ -225,6 +225,7 @@ module pbb-evpn {
                     type enumeration {
                         enum GigabitEthernet;
                         enum TenGigabitEthernet;
+                        enum Bundle-Ether;
                     }
                     default GigabitEthernet;
                 }
@@ -294,6 +295,14 @@ module pbb-evpn {
                                                         to pick free port.";
                         }
                     }
+                        leaf pe-bundle-port {
+                        tailf:info "Customer Facing Interface";
+                        when "(../../interface-type = 'Bundle-Ether')";
+                        type leafref {
+                            path "deref(../../pe-device)/../ncs:config/cisco-ios-xr:interface/cisco-ios-xr:Bundle-Ether/cisco-ios-xr:id";
+                        }
+                    }
+
                 }
 
                 leaf nni-redundancy {

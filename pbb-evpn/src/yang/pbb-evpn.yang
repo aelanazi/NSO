@@ -186,19 +186,26 @@ module pbb-evpn {
                     // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='1990']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='site-a']/pbb-evpn:edge-i-sid 4900000
                     // /ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id='1990']/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id='site-b']/pbb-evpn:edge-i-sid 4900000
                     // Prevent the reuse of the SID ID for any service (E-LINE, E-LAN, E-Tree) The follwoin must statment makes sure the SID is unique.
+                    // Ignore a node   *[not(*)] not working || tryied /*/ not working tried /./
+                    //		"not(/ncs:services//*//*/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid=current()/../edge-i-sid)" {	
+                    // "not(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../vpn-id]/pbb-evpn:evi=current()/../evi)" 
+                    must "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]//pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid=current())
+                                        = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]//pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid=current())
+                                        = 0 and " +
+                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]//pbb-evpn:link[pbb-evpn:link-id=current()/../link-id]/pbb-evpn:edge-i-sid=current())
+                                        = 0 " {
 
-                    must "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 and " +
-                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 and " +
-                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 and " +
-                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 and " +
-                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 and " +
-                                        "count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
-                                        =current()) = 0 " {
+                        //"count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                        //=current()) = 0 or " +
+                        //"count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                        //=current()) = 0 or " +
+                        //"count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:elan/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                        //=current()) = 0 or " +
+                        //"count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id =current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                        //=current()) = 0 or " +
+                        //"count(/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../vpn-id]/pbb-evpn:etree/pbb-evpn:link[pbb-evpn:link-id!=current()/../link-id]/pbb-evpn:edge-i-sid
+                        //=current()) = 0 " {
                         error-message "I-SID (Instance Service ID) is already used by another service,
                                                 please make sure to pick free I-SID ID.";
                     }
@@ -266,15 +273,15 @@ module pbb-evpn {
                         //                        =current()]) and (/ncs:services/pbb-evpn:pbb-evpn[pbb-evpn:vpn-id !=current()/../../../../vpn-id]/pbb-evpn:eline/pbb-evpn:link[pbb-evpn:link-id
                         //                        !=current()/../../link-id][pbb-evpn:pe-device =current()/../../pe-device][pbb-evpn:svlan-id =current()/../../svlan-id])" {
 
-                            //	../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device=
-                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                            //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device=
-                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                            //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device=
-                            //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
-                            //                        " {
-                            //error-message "Interface is already used by another service, please make sure
-                           //                             to pick free port.";
+                        //	../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/eline/link[pe-device=
+                        //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                        //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/elan/link[pe-device=
+                        //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                        //                        or count(../../../../../pbb-evpn[customer-name != current()/../../../../customer-name]/etree/link[pe-device=
+                        //                        current()/../../pe-device][pe-port/pe-gig-port=current()]) = 0
+                        //                        " {
+                        //error-message "Interface is already used by another service, please make sure
+                        //                             to pick free port.";
                         //}
                     }
                     leaf pe-tengig-port {

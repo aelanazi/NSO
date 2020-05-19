@@ -3,6 +3,8 @@ import ncs
 import devicehelper
 import validations
 from ncs.application import Service
+
+
 # import ncs.maapi as maapi
 # import ncs.maagic as maagic
 
@@ -36,8 +38,7 @@ class ServiceCallbacks(Service):
             num_end_points = len(endpoints.link)
             self.log.info("Number of endpoints: ", num_end_points)
             self._config_service(root, service, endpoints)
-        else:
-            serv_type == serv_etree
+        elif serv_type == serv_etree:
             self.log.info("Provisioning Service type: ", serv_type)
             endpoints = service.etree
             num_end_points = len(endpoints.link)
@@ -50,19 +51,19 @@ class ServiceCallbacks(Service):
         links_data = []
         idx = str(1)
         for link in endpoints.link:
-            link_data = {'pe_device': link.pe_device}
-            link_data['bundle'] = "false"
-            link_data['gig'] = "false"
-            link_data['tengig'] = "false"
-            link_data['dual-pe'] = "false"
-            link_data['edge_i_sid'] = link.edge_i_sid
-            link_data['svlan_id'] = link.svlan_id
+            link_data = {'pe_device': link.pe_device,
+                         'bundle': "false",
+                         'gig': "false",
+                         'tengig': "false",
+                         'dual-pe': "false",
+                         'edge_i_sid': link.edge_i_sid,
+                         'svlan_id': link.svlan_id
+                         }
             if link.interface_type == "GigabitEthernet":
                 link_data['gig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_gig_port
                 link_data['pe_port_type'] = "GigabitEthernet"
-            else:
-                link.interface_type == "TenGigabitEthernet"
+            elif link.interface_type == "TenGigabitEthernet":
                 link_data['tengig'] = "true"
                 link_data['pe_port_1'] = link.pe_port.pe_tengig_port
                 link_data['pe_port_type'] = "TenGigabitEthernet"
@@ -71,18 +72,15 @@ class ServiceCallbacks(Service):
                 link_data['dual-pe'] = "true"
                 link_data['esi'] = link.Dual_PE.esi
 
-            if link.nni_redundancy == "Protected":
+            elif link.nni_redundancy == "Protected":
                 link_data['bundle'] = "true"
-                protect_name = "protect"
-                protect = (protect_name+idx)
                 protect = []
                 link_data['pe_port_type'] = "Bundle-Ether"
                 if link_data['gig'] == "true":
                     for protect_loop in link.Bundle_Ether.pe_port:
                         protect.append(protect_loop.pe_port)
                     link_data['pe_port'] = protect
-                else:
-                    link_data['tengig'] == "true"
+                elif link_data['tengig'] == "true":
                     for protect_loop in link.Bundle_Ether.pe_port_tengig:
                         protect.append(protect_loop.pe_port)
                     link_data['pe_port'] = protect
@@ -95,15 +93,11 @@ class ServiceCallbacks(Service):
                     link_data['spoke'] = "true"
                     link_data['SPOKE-ROUTE-TARGET'] = link.spoke_route_target
             else:
-                rtx_name = "rtx"
-                rtx = (rtx_name+idx)
                 rtx = []
                 for RT_EXPORT in endpoints.route_target.rt_export:
                     rtx.append(RT_EXPORT.asn_ip)
                 link_data['RT_EXPORT'] = rtx
 
-                rtm_name = "rtm"
-                rtm = (rtm_name+idx)
                 rtm = []
                 for RT_IMPORT in endpoints.route_target.rt_import:
                     rtm.append(RT_IMPORT.asn_ip)
@@ -125,13 +119,14 @@ class ServiceCallbacks(Service):
             vars.add('PE-PORT-1', link['pe_port_1'])
             vars.add('EDGE-I-SID', link['edge_i_sid'])
             log_prefix = "PBB-EVPN::"
-            if validations.is_svlan_id_in_use(root, service, **link):
-                raise ValueError(log_prefix + "SVLAN-ID {} not unique on device {} using the giving port {}{}".format(link['svlan_id'], link['pe_device'], link['pe_port_type'], link['pe_port_1']))
+            if validations.is_svlan_id_in_use(**link):
+                raise ValueError(log_prefix + "SVLAN-ID {} not unique on device {} using the giving port {}{}".format(
+                    link['svlan_id'], link['pe_device'], link['pe_port_type'], link['pe_port_1']))
 
             vars.add('SVLAN-ID', link['svlan_id'])
             if link['pe_port_type'] == "Bundle-Ether":
                 vars.add(
-                    'INT-TYPE', devicehelper.get_bundle_id(root, service, **link))
+                    'INT-TYPE', devicehelper.get_bundle_id(**link))
                 vars.add('PE-PORT-TYPE', link['pe_port_type'])
             else:
                 vars.add('INT-TYPE', link['pe_port_1'])
